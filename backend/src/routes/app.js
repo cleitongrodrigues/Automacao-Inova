@@ -6,8 +6,10 @@ const router = express.Router();
 
 const alunosRoutes = require('./alunosRoutes');
 const presencaRoutes = require('./presencaRoutes');
+const eventosRoutes = require('./eventosRoutes');
 
 router.use('/alunos', alunosRoutes);
+router.use('/eventos', eventosRoutes);
 router.use('/', presencaRoutes);
 
 module.exports = router;

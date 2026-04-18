@@ -1,17 +1,17 @@
-<!-- Gestão de Eventos - CRUD e Geração de QR Code -->
+<!-- GestÃ£o de Eventos - CRUD e GeraÃ§Ã£o de QR Code -->
 
-<!-- Cabeçalho -->
+<!-- CabeÃ§alho -->
 <div style="margin-bottom: 2rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <h1 style="margin-bottom: 0.5rem;">📅 Gestão de Eventos</h1>
+      <h1 style="margin-bottom: 0.5rem;">ðŸ“… GestÃ£o de Eventos</h1>
       <p style="color: var(--cor-texto-secundario); margin: 0;">
-        Criar eventos e gerar QR Codes para registro de presença
+        Criar eventos e gerar QR Codes para registro de presenÃ§a
       </p>
     </div>
     <div>
       <button onclick="abrirModalNovoEvento()" class="btn btn-primary">
-        ➕ Novo Evento
+        âž• Novo Evento
       </button>
     </div>
   </div>
@@ -21,7 +21,7 @@
 <div id="evento-atual-card" class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--cor-primaria); background: linear-gradient(135deg, var(--cor-fundo) 0%, var(--cor-fundo-secundario) 100%);">
   <div style="display: flex; justify-content: space-between; align-items: center; gap: 2rem;">
     <div style="flex: 1;">
-      <h2 style="margin-bottom: 0.5rem;">🎯 Evento Ativo Hoje</h2>
+      <h2 style="margin-bottom: 0.5rem;">ðŸŽ¯ Evento Ativo Hoje</h2>
       <p id="evento-atual-nome" style="font-size: 1.2rem; margin: 0.5rem 0;">-</p>
       <p id="evento-atual-data" style="color: var(--cor-texto-secundario); margin: 0;">-</p>
     </div>
@@ -30,7 +30,7 @@
         <p style="color: var(--cor-texto-secundario); margin: 0;">Nenhum evento ativo</p>
       </div>
       <button id="btn-download-qr-atual" onclick="downloadQRCode('qrcode-atual', 'evento-atual.png')" class="btn btn-sm btn-secondary" style="margin-top: 1rem; display: none;">
-        ⬇️ Baixar QR Code
+        â¬‡ï¸ Baixar QR Code
       </button>
     </div>
   </div>
@@ -62,7 +62,7 @@
           <th>Status</th>
           <th>Reconhecimento Facial</th>
           <th>QR Code</th>
-          <th>Ações</th>
+          <th>AÃ§Ãµes</th>
         </tr>
       </thead>
       <tbody id="tbody-eventos">
@@ -101,7 +101,7 @@
               type="text" 
               id="nome-evento" 
               class="form-control" 
-              placeholder="Encontro de Sábado - Abril 2026"
+              placeholder="Encontro de SÃ¡bado - Abril 2026"
               required
             >
             <span class="form-error" id="erro-nome-evento"></span>
@@ -110,7 +110,7 @@
           <!-- Data -->
           <div class="form-group">
             <label for="data-evento" class="form-label">
-              Data (Sábado) <span style="color: var(--cor-erro);">*</span>
+              Data (SÃ¡bado) <span style="color: var(--cor-erro);">*</span>
             </label>
             <input 
               type="date" 
@@ -120,14 +120,14 @@
               onchange="validarSabado(this)"
             >
             <small style="color: var(--cor-texto-secundario);">
-              Apenas sábados são permitidos
+              Apenas sÃ¡bados sÃ£o permitidos
             </small>
             <span class="form-error" id="erro-data-evento"></span>
           </div>
           
-          <!-- Horário Início -->
+          <!-- HorÃ¡rio InÃ­cio -->
           <div class="form-group">
-            <label for="horario-inicio" class="form-label">Horário de Início</label>
+            <label for="horario-inicio" class="form-label">HorÃ¡rio de InÃ­cio</label>
             <input 
               type="time" 
               id="horario-inicio" 
@@ -136,9 +136,9 @@
             >
           </div>
           
-          <!-- Horário Fim -->
+          <!-- HorÃ¡rio Fim -->
           <div class="form-group">
-            <label for="horario-fim" class="form-label">Horário de Término</label>
+            <label for="horario-fim" class="form-label">HorÃ¡rio de TÃ©rmino</label>
             <input 
               type="time" 
               id="horario-fim" 
@@ -152,23 +152,23 @@
             <div class="form-check">
               <input type="checkbox" id="requer-facial" class="form-check-input">
               <label for="requer-facial" class="form-check-label">
-                <strong>🔐 Requer Reconhecimento Facial</strong>
+                <strong>ðŸ” Requer Reconhecimento Facial</strong>
                 <br>
                 <small style="color: var(--cor-texto-secundario);">
-                  Alunos precisarão tirar selfie ao registrar presença
+                  Alunos precisarÃ£o tirar selfie ao registrar presenÃ§a
                 </small>
               </label>
             </div>
           </div>
           
-          <!-- Descrição -->
+          <!-- DescriÃ§Ã£o -->
           <div class="form-group">
-            <label for="descricao-evento" class="form-label">Descrição (opcional)</label>
+            <label for="descricao-evento" class="form-label">DescriÃ§Ã£o (opcional)</label>
             <textarea 
               id="descricao-evento" 
               class="form-control" 
               rows="3"
-              placeholder="Informações adicionais sobre o evento..."
+              placeholder="InformaÃ§Ãµes adicionais sobre o evento..."
             ></textarea>
           </div>
           
@@ -180,7 +180,7 @@
           Cancelar
         </button>
         <button onclick="salvarEvento()" class="btn btn-primary">
-          💾 Salvar
+          ðŸ’¾ Salvar
         </button>
       </div>
     </div>
@@ -199,7 +199,7 @@
       <div class="modal-body" style="text-align: center;">
         <h4 id="qrcode-evento-nome" style="margin-bottom: 1rem;"></h4>
         <div id="qrcode-preview" style="display: inline-block; background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--sombra);">
-          <!-- QR Code será gerado aqui -->
+          <!-- QR Code serÃ¡ gerado aqui -->
         </div>
         
         <div style="margin-top: 2rem; padding: 1rem; background: var(--cor-fundo-secundario); border-radius: var(--border-radius);">
@@ -214,14 +214,14 @@
             style="margin-top: 0.5rem; font-family: monospace; font-size: 0.75rem;"
           >
           <button onclick="copiarLink()" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem;">
-            📋 Copiar Link
+            ðŸ“‹ Copiar Link
           </button>
         </div>
       </div>
       
       <div class="modal-footer">
         <button onclick="downloadQRCode('qrcode-preview', 'qrcode-evento.png')" class="btn btn-primary">
-          ⬇️ Baixar QR Code
+          â¬‡ï¸ Baixar QR Code
         </button>
       </div>
     </div>
@@ -229,70 +229,30 @@
 </div>
 
 
-
 <script>
   // Proteger rota
   var paginaAutorizadaEventos = protegerRota();
   
   var filtroAtual = 'todos';
-  var eventosFake = [
-    { 
-      id: 1, 
-      nome: 'Encontro de Sábado - Abril 2026', 
-      data: '2026-04-18', 
-      horario_inicio: '08:00', 
-      horario_fim: '12:00',
-      requer_reconhecimento_facial: true, 
-      ativo: true,
-      token: 'ABC123XYZ'
-    },
-    { 
-      id: 2, 
-      nome: 'Encontro de Sábado - Abril 2026', 
-      data: '2026-04-11', 
-      horario_inicio: '08:00', 
-      horario_fim: '12:00',
-      requer_reconhecimento_facial: false, 
-      ativo: false,
-      token: 'DEF456UVW'
-    },
-    { 
-      id: 3, 
-      nome: 'Encontro de Sábado - Abril 2026', 
-      data: '2026-04-25', 
-      horario_inicio: '08:00', 
-      horario_fim: '12:00',
-      requer_reconhecimento_facial: true, 
-      ativo: false,
-      token: 'GHI789RST'
-    }
-  ];
-  
+  var eventosCache = [];
+
   /**
-   * Carregar eventos
+   * Carregar eventos da API
    */
   async function carregarEventos() {
     try {
-      // ========================================
-      // 🧪 MODO TESTE
-      // ========================================
-      renderizarTabelaEventos(eventosFake);
-      mostrarEventoAtual(eventosFake);
-      return; // Remover quando ativar API real
-      
-      // ========================================
-      // 🔒 API REAL
-      // ========================================
-      /*
       const resultado = await API.listarEventos();
-      
-      if (resultado.success) {
-        renderizarTabelaEventos(resultado.eventos);
-        mostrarEventoAtual(resultado.eventos);
+
+      if (resultado.sucesso || resultado.success) {
+        eventosCache = resultado.eventos || [];
+        renderizarTabelaEventos(eventosCache);
+        mostrarEventoAtual(eventosCache);
+      } else {
+        mostrarMensagem('error', resultado.mensagem || 'Erro ao carregar eventos');
       }
-      */
     } catch (error) {
       console.error('Erro:', error);
+      mostrarMensagem('error', 'Erro ao carregar eventos');
     }
   }
   
@@ -305,10 +265,9 @@
     
     if (eventoHoje) {
       document.getElementById('evento-atual-nome').textContent = eventoHoje.nome;
-      document.getElementById('evento-atual-data').textContent = `📅 ${formatarData(new Date(eventoHoje.data + 'T00:00:00'))} | ⏰ ${eventoHoje.horario_inicio} - ${eventoHoje.horario_fim}`;
+      document.getElementById('evento-atual-data').textContent = `ðŸ“… ${formatarData(new Date(eventoHoje.data + 'T00:00:00'))} | â° ${eventoHoje.horario_inicio} - ${eventoHoje.horario_fim}`;
       
-      // Gerar QR Code
-      const link = `${window.location.origin}/index.html#/presenca?token=${eventoHoje.token}`;
+      const link = `${window.location.origin}/index.html#/presenca?token=${eventoHoje.qr_code_token}`;
       const qrcodeDiv = document.getElementById('qrcode-atual');
       qrcodeDiv.innerHTML = '';
       
@@ -335,7 +294,6 @@
   function renderizarTabelaEventos(eventos) {
     const tbody = document.getElementById('tbody-eventos');
     
-    // Filtrar
     let eventosFiltrados = eventos;
     if (filtroAtual === 'ativos') {
       eventosFiltrados = eventos.filter(e => e.ativo);
@@ -343,7 +301,6 @@
       eventosFiltrados = eventos.filter(e => !e.ativo);
     }
     
-    // Ordenar por data (mais recente primeiro)
     eventosFiltrados.sort((a, b) => new Date(b.data) - new Date(a.data));
     
     if (eventosFiltrados.length === 0) {
@@ -365,23 +322,23 @@
         <td>${evento.nome}</td>
         <td>
           <span class="badge ${evento.ativo ? 'badge-success' : 'badge-secondary'}">
-            ${evento.ativo ? '✓ Ativo' : '✗ Inativo'}
+            ${evento.ativo ? 'âœ“ Ativo' : 'âœ— Inativo'}
           </span>
         </td>
         <td>
-          ${evento.requer_reconhecimento_facial ? '🔐 Sim' : '- Não'}
+          ${evento.requer_reconhecimento_facial ? 'ðŸ” Sim' : '- NÃ£o'}
         </td>
         <td>
           <button onclick="visualizarQRCode(${evento.id})" class="btn btn-sm btn-secondary">
-            📱 Ver QR
+            ðŸ“± Ver QR
           </button>
         </td>
         <td>
           <button onclick="editarEvento(${evento.id})" class="btn btn-sm btn-secondary" title="Editar">
-            ✏️
+            âœï¸
           </button>
           <button onclick="toggleStatusEvento(${evento.id})" class="btn btn-sm ${evento.ativo ? 'btn-danger' : 'btn-success'}" title="${evento.ativo ? 'Desativar' : 'Ativar'}">
-            ${evento.ativo ? '🔒' : '✅'}
+            ${evento.ativo ? 'ðŸ”’' : 'âœ…'}
           </button>
         </td>
       </tr>
@@ -394,7 +351,6 @@
   function filtrarEventos(filtro) {
     filtroAtual = filtro;
     
-    // Atualizar botões
     document.querySelectorAll('.btn-group .btn').forEach(btn => {
       btn.classList.remove('btn-primary');
       btn.classList.add('btn-outline');
@@ -402,18 +358,18 @@
     document.getElementById(`filtro-${filtro}`).classList.remove('btn-outline');
     document.getElementById(`filtro-${filtro}`).classList.add('btn-primary');
     
-    renderizarTabelaEventos(eventosFake);
+    renderizarTabelaEventos(eventosCache);
   }
   
   /**
-   * Validar se é sábado
+   * Validar se Ã© sÃ¡bado
    */
   function validarSabado(input) {
     const data = new Date(input.value + 'T00:00:00');
     const diaSemana = data.getDay();
     
-    if (diaSemana !== 6) { // 6 = Sábado
-      document.getElementById('erro-data-evento').textContent = 'Selecione um sábado!';
+    if (diaSemana !== 6) {
+      document.getElementById('erro-data-evento').textContent = 'Selecione um sÃ¡bado!';
       input.value = '';
     } else {
       document.getElementById('erro-data-evento').textContent = '';
@@ -427,9 +383,8 @@
     document.getElementById('modal-titulo').textContent = 'Novo Evento';
     document.getElementById('form-evento').reset();
     document.getElementById('evento-id').value = '';
-    document.getElementById('requer-facial').checked = true; // Padrão: SIM
+    document.getElementById('requer-facial').checked = true;
     
-    // Sugerir próximo sábado
     const hoje = new Date();
     const diasAteProximoSabado = (6 - hoje.getDay() + 7) % 7 || 7;
     const proximoSabado = new Date(hoje.getTime() + diasAteProximoSabado * 24 * 60 * 60 * 1000);
@@ -447,7 +402,7 @@
   }
   
   /**
-   * Salvar evento
+   * Salvar evento (criar ou editar)
    */
   async function salvarEvento() {
     const id = document.getElementById('evento-id').value;
@@ -458,59 +413,39 @@
     const requerFacial = document.getElementById('requer-facial').checked;
     const descricao = document.getElementById('descricao-evento').value.trim();
     
-    // Validações
     if (campoVazio(nome)) {
-      document.getElementById('erro-nome-evento').textContent = 'Nome é obrigatório';
+      document.getElementById('erro-nome-evento').textContent = 'Nome Ã© obrigatÃ³rio';
       return;
     }
-    
     if (campoVazio(data)) {
-      document.getElementById('erro-data-evento').textContent = 'Data é obrigatória';
+      document.getElementById('erro-data-evento').textContent = 'Data Ã© obrigatÃ³ria';
       return;
     }
     
-    // ========================================
-    // 🧪 MODO TESTE
-    // ========================================
     mostrarLoading();
-    
-    setTimeout(() => {
-      if (id) {
-        // Editar
-        const index = eventosFake.findIndex(e => e.id == id);
-        if (index !== -1) {
-          eventosFake[index] = { 
-            ...eventosFake[index], 
-            nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim, 
-            requer_reconhecimento_facial: requerFacial, descricao
-          };
-        }
-        mostrarMensagem('success', 'Evento atualizado!');
-      } else {
-        // Criar
-        const novoId = Math.max(...eventosFake.map(e => e.id)) + 1;
-        const token = Math.random().toString(36).substring(2, 15);
-        eventosFake.push({ 
-          id: novoId, 
-          nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim,
-          requer_reconhecimento_facial: requerFacial, descricao,
-          ativo: false,
-          token
-        });
-        mostrarMensagem('success', 'Evento criado com sucesso!');
-      }
-      
-      esconderLoading();
+
+    const payload = { nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim, requer_reconhecimento_facial: requerFacial, descricao };
+
+    const resultado = id
+      ? await API.atualizarEvento(id, payload)
+      : await API.criarEvento(payload);
+
+    esconderLoading();
+
+    if (resultado.sucesso || resultado.success) {
+      mostrarMensagem('success', id ? 'Evento atualizado!' : 'Evento criado com sucesso!');
       fecharModalEvento();
       carregarEventos();
-    }, 500);
+    } else {
+      mostrarMensagem('error', resultado.mensagem || 'Erro ao salvar evento');
+    }
   }
   
   /**
    * Editar evento
    */
   function editarEvento(id) {
-    const evento = eventosFake.find(e => e.id === id);
+    const evento = eventosCache.find(e => e.id === id);
     if (!evento) return;
     
     document.getElementById('modal-titulo').textContent = 'Editar Evento';
@@ -528,40 +463,31 @@
   /**
    * Toggle status ativo/inativo
    */
-  function toggleStatusEvento(id) {
-    const evento = eventosFake.find(e => e.id === id);
-    if (!evento) return;
-    
-    evento.ativo = !evento.ativo;
-    mostrarMensagem('success', `Evento ${evento.ativo ? 'ativado' : 'desativado'}!`);
-    carregarEventos();
+  async function toggleStatusEvento(id) {
+    const resultado = await API.toggleStatusEvento(id);
+    if (resultado.sucesso || resultado.success) {
+      mostrarMensagem('success', resultado.mensagem || 'Status alterado!');
+      carregarEventos();
+    } else {
+      mostrarMensagem('error', resultado.mensagem || 'Erro ao alterar status');
+    }
   }
   
   /**
    * Visualizar QR Code
    */
   function visualizarQRCode(id) {
-    const evento = eventosFake.find(e => e.id === id);
+    const evento = eventosCache.find(e => e.id === id);
     if (!evento) return;
     
     document.getElementById('qrcode-evento-nome').textContent = evento.nome;
     
-    const link = `${window.location.origin}/index.html#/presenca?token=${evento.token}`;
+    const link = `${window.location.origin}/index.html#/presenca?token=${evento.qr_code_token}`;
     document.getElementById('link-presenca').value = link;
     document.getElementById('modal-qrcode').classList.add('active');
     
     const qrcodeDiv = document.getElementById('qrcode-preview');
     qrcodeDiv.innerHTML = '';
-
-    if (!window.QRCode || typeof window.QRCode.toCanvas !== 'function') {
-      qrcodeDiv.innerHTML = `
-        <p style="color: var(--cor-erro); margin-bottom: 1rem;">Biblioteca de QR indisponível.</p>
-        <p style="font-size: 0.875rem; color: var(--cor-texto-secundario); margin: 0;">
-          Use o link abaixo para teste: <a href="${link}" target="_blank" rel="noopener noreferrer">abrir presenca</a>
-        </p>
-      `;
-      return;
-    }
 
     try {
       QRCode.toCanvas(link, { width: 300, margin: 2 }, (error, canvas) => {
@@ -597,7 +523,7 @@
   function downloadQRCode(divId, nomeArquivo) {
     const canvas = document.querySelector(`#${divId} canvas`);
     if (!canvas) {
-      mostrarMensagem('error', 'QR Code não encontrado');
+      mostrarMensagem('error', 'QR Code nÃ£o encontrado');
       return;
     }
     
@@ -610,7 +536,6 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
       mostrarMensagem('success', 'QR Code baixado!');
     });
   }
@@ -619,4 +544,6 @@
   if (paginaAutorizadaEventos) {
     carregarEventos();
   }
+</script>
+
 </script>

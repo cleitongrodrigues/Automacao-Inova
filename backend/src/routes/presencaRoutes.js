@@ -6,5 +6,7 @@ const presencasController = require('../controllers/presencas/presencasControlle
 
 router.get('/evento-atual', eventosController.obterEventoAtual);
 router.post('/registrar-presenca', presencasController.registrar);
+router.get('/lista-presenca', presencasController.listarPresencas);
+router.get('/estatisticas', presencasController.obterEstatisticas);
 
 module.exports = router;

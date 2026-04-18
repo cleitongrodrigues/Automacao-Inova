@@ -201,57 +201,18 @@
   async function atualizarEstatisticas() {
     const dataInicio = document.getElementById('data-inicio').value;
     const dataFim = document.getElementById('data-fim').value;
-    
-    // ========================================
-    // 🧪 MODO TESTE - Dados mockados
-    // ========================================
-    const dadosFake = {
-      totalEventos: 8,
-      totalPresencas: 156,
-      mediaPresenca: 78,
-      totalAlunos: 25,
-      presentes: 156,
-      ausentes: 44,
-      eventosPorData: [
-        { data: '2026-03-07', nome: 'Encontro de Sábado', presentes: 18, ausentes: 7, total: 25 },
-        { data: '2026-03-14', nome: 'Encontro de Sábado', presentes: 20, ausentes: 5, total: 25 },
-        { data: '2026-03-21', nome: 'Encontro de Sábado', presentes: 19, ausentes: 6, total: 25 },
-        { data: '2026-03-28', nome: 'Encontro de Sábado', presentes: 21, ausentes: 4, total: 25 },
-        { data: '2026-04-04', nome: 'Encontro de Sábado', presentes: 17, ausentes: 8, total: 25 },
-        { data: '2026-04-11', nome: 'Encontro de Sábado', presentes: 22, ausentes: 3, total: 25 },
-        { data: '2026-04-18', nome: 'Encontro de Sábado', presentes: 20, ausentes: 5, total: 25 },
-        { data: '2026-04-25', nome: 'Encontro de Sábado', presentes: 19, ausentes: 6, total: 25 }
-      ],
-      rankingPresentes: [
-        { nome: 'João Silva', presencas: 8, percentual: 100 },
-        { nome: 'Maria Santos', presencas: 8, percentual: 100 },
-        { nome: 'Ana Costa', presencas: 7, percentual: 87.5 },
-        { nome: 'Pedro Oliveira', presencas: 7, percentual: 87.5 },
-        { nome: 'Julia Ferreira', presencas: 6, percentual: 75 }
-      ],
-      rankingAusentes: [
-        { nome: 'Carlos Lima', faltas: 5, percentual: 62.5 },
-        { nome: 'Lucas Martins', faltas: 4, percentual: 50 },
-        { nome: 'Beatriz Alves', faltas: 3, percentual: 37.5 },
-        { nome: 'Rafael Costa', faltas: 3, percentual: 37.5 },
-        { nome: 'Fernanda Dias', faltas: 2, percentual: 25 }
-      ]
-    };
-    
-    renderizarEstatisticas(dadosFake);
-    
-    return; // Remover quando ativar API real
-    
-    // ========================================
-    // 🔒 API REAL
-    // ========================================
-    /*
-    const resultado = await API.obterEstatisticas(dataInicio, dataFim);
-    
-    if (resultado.success) {
+
+    const filtros = {};
+    if (dataInicio) filtros.dataInicio = dataInicio;
+    if (dataFim) filtros.dataFim = dataFim;
+
+    const resultado = await API.obterEstatisticas(filtros);
+
+    if (resultado.sucesso || resultado.success) {
       renderizarEstatisticas(resultado.dados);
+    } else {
+      mostrarMensagem('error', resultado.mensagem || 'Erro ao carregar estatísticas');
     }
-    */
   }
   
   /**

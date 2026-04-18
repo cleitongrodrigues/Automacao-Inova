@@ -107,5 +107,113 @@ module.exports = {
         dados: error.message
       });
     }
+  },
+
+  // GET /lista-presenca  (dashboard: todos alunos + status hoje)
+  async listarPresencas(req, res) {
+    try {
+      const hoje = dataHojeISO();
+
+      const [presencas] = await db.query(
+        `SELECT
+           a.id, a.nome, a.cpf, a.matricula, a.email,
+           CASE WHEN p.id IS NOT NULL THEN 1 ELSE 0 END AS presente,
+           p.data_hora_registro AS hora_registro
+         FROM alunos a
+         LEFT JOIN presencas p
+           ON p.aluno_id = a.id
+           AND p.evento_id IN (SELECT id FROM eventos WHERE data = ? AND ativo = 1)
+         WHERE a.ativo = 1
+         ORDER BY a.nome`,
+        [hoje]
+      );
+
+      return res.status(200).json({ sucesso: true, presencas });
+    } catch (error) {
+      return res.status(500).json({ sucesso: false, mensagem: 'Erro ao listar presencas', dados: error.message });
+    }
+  },
+
+  // GET /estatisticas?dataInicio=YYYY-MM-DD&dataFim=YYYY-MM-DD
+  async obterEstatisticas(req, res) {
+    try {
+      const hoje = dataHojeISO();
+      const dataInicio = req.query.dataInicio || `${new Date().getFullYear()}-01-01`;
+      const dataFim = req.query.dataFim || hoje;
+
+      const [totalAlunos] = await db.query('SELECT COUNT(*) AS total FROM alunos WHERE ativo = 1');
+      const totalA = totalAlunos[0].total || 0;
+
+      const [eventoRows] = await db.query(
+        `SELECT
+           e.id, e.data, e.nome,
+           COUNT(p.id) AS presentes
+         FROM eventos e
+         LEFT JOIN presencas p ON p.evento_id = e.id
+         WHERE e.data BETWEEN ? AND ?
+         GROUP BY e.id
+         ORDER BY e.data`,
+        [dataInicio, dataFim]
+      );
+
+      const eventosPorData = eventoRows.map(e => ({
+        data: e.data,
+        nome: e.nome,
+        presentes: e.presentes,
+        ausentes: totalA - e.presentes,
+        total: totalA
+      }));
+
+      const totalEventos = eventoRows.length;
+      const totalPresencas = eventoRows.reduce((s, e) => s + e.presentes, 0);
+      const totalPossivel = totalEventos * totalA;
+      const mediaPresenca = totalPossivel > 0 ? Math.round((totalPresencas / totalPossivel) * 100) : 0;
+      const totalAusencias = totalPossivel - totalPresencas;
+
+      // ranking presentes
+      const [rankP] = await db.query(
+        `SELECT a.nome, COUNT(p.id) AS presencas,
+           ROUND(COUNT(p.id) * 100.0 / NULLIF((SELECT COUNT(*) FROM eventos WHERE data BETWEEN ? AND ?), 0), 1) AS percentual
+         FROM alunos a
+         JOIN presencas p ON p.aluno_id = a.id
+         JOIN eventos e ON e.id = p.evento_id
+         WHERE e.data BETWEEN ? AND ? AND a.ativo = 1
+         GROUP BY a.id ORDER BY presencas DESC LIMIT 5`,
+        [dataInicio, dataFim, dataInicio, dataFim]
+      );
+
+      // ranking faltas
+      const [rankA] = await db.query(
+        `SELECT a.nome,
+           (SELECT COUNT(*) FROM eventos WHERE data BETWEEN ? AND ?) - COUNT(p.id) AS faltas,
+           ROUND(((SELECT COUNT(*) FROM eventos WHERE data BETWEEN ? AND ?) - COUNT(p.id)) * 100.0
+             / NULLIF((SELECT COUNT(*) FROM eventos WHERE data BETWEEN ? AND ?), 0), 1) AS percentual
+         FROM alunos a
+         LEFT JOIN presencas p ON p.aluno_id = a.id
+           AND p.evento_id IN (SELECT id FROM eventos WHERE data BETWEEN ? AND ?)
+         WHERE a.ativo = 1
+         GROUP BY a.id
+         HAVING faltas > 0
+         ORDER BY faltas DESC LIMIT 5`,
+        [dataInicio, dataFim, dataInicio, dataFim, dataInicio, dataFim, dataInicio, dataFim]
+      );
+
+      return res.status(200).json({
+        sucesso: true,
+        dados: {
+          totalEventos,
+          totalPresencas,
+          mediaPresenca,
+          totalAlunos: totalA,
+          presentes: totalPresencas,
+          ausentes: totalAusencias,
+          eventosPorData,
+          rankingPresentes: rankP,
+          rankingAusentes: rankA
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({ sucesso: false, mensagem: 'Erro ao calcular estatisticas', dados: error.message });
+    }
   }
 };

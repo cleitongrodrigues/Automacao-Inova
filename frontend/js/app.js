@@ -157,7 +157,8 @@ function mostrarPagina404() {
  */
 window.addEventListener('hashchange', () => {
   const hash = window.location.hash.slice(1); // Remove o #
-  carregarPagina(hash || '/');
+  const rota = hash.split('?')[0] || '/';     // Remove query string
+  carregarPagina(rota);
 });
 
 /**
@@ -168,7 +169,8 @@ function inicializarApp() {
   
   // Carregar página inicial baseada no hash
   const hashInicial = window.location.hash.slice(1) || '/';
-  carregarPagina(hashInicial);
+  const rotaInicial = hashInicial.split('?')[0] || '/';
+  carregarPagina(rotaInicial);
   
   // Exibir informações do usuário (se autenticado)
   if (estaAutenticado()) {

@@ -84,52 +84,19 @@
    */
   async function carregarListaPresenca() {
     try {
-      // ========================================
-      // 🧪 MODO TESTE - Dados mockados
-      // ========================================
-      // Comentar o bloco abaixo quando o backend estiver pronto
-      
-      const presencasFake = [
-        { nome: 'João Silva', cpf: '12345678901', matricula: 'A001', presente: true, hora_registro: new Date().toISOString() },
-        { nome: 'Maria Santos', cpf: '23456789012', matricula: 'A002', presente: true, hora_registro: new Date().toISOString() },
-        { nome: 'Pedro Oliveira', cpf: '34567890123', matricula: 'A003', presente: false },
-        { nome: 'Ana Costa', cpf: '45678901234', matricula: 'A004', presente: true, hora_registro: new Date().toISOString() },
-        { nome: 'Carlos Lima', cpf: '56789012345', matricula: 'A005', presente: false },
-        { nome: 'Julia Ferreira', cpf: '67890123456', matricula: 'A006', presente: true, hora_registro: new Date().toISOString() },
-        { nome: 'Lucas Martins', cpf: '78901234567', matricula: 'A007', presente: false },
-        { nome: 'Beatriz Alves', cpf: '89012345678', matricula: 'A008', presente: true, hora_registro: new Date().toISOString() }
-      ];
-      
-      renderizarPresencas(presencasFake);
-      atualizarEstatisticas(presencasFake);
-      
-      // Atualizar status
-      document.getElementById('status-atualizacao').textContent = '✓ Atualizado (Modo Teste)';
-      setTimeout(() => {
-        document.getElementById('status-atualizacao').textContent = 'Modo Teste';
-      }, 2000);
-      
-      return; // Remover esta linha quando ativar a API real
-      
-      // ========================================
-      // 🔒 API REAL (ativar quando backend estiver pronto)
-      // ========================================
-      /*
       const resultado = await API.listarPresencas();
-      
-      if (resultado.success) {
-        renderizarPresencas(resultado.presencas);
-        atualizarEstatisticas(resultado.presencas);
-        
-        // Atualizar status
+
+      if (resultado.sucesso || resultado.success) {
+        renderizarPresencas(resultado.presencas || []);
+        atualizarEstatisticas(resultado.presencas || []);
+
         document.getElementById('status-atualizacao').textContent = '✓ Atualizado';
         setTimeout(() => {
           document.getElementById('status-atualizacao').textContent = 'Ao vivo';
         }, 2000);
       } else {
-        mostrarMensagem('error', resultado.message || 'Erro ao carregar presença');
+        mostrarMensagem('error', resultado.mensagem || 'Erro ao carregar presença');
       }
-      */
     } catch (error) {
       console.error('Erro:', error);
       mostrarMensagem('error', 'Erro ao carregar presença');

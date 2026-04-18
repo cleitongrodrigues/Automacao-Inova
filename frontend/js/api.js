@@ -13,6 +13,7 @@ async function requisicaoJSON(url, options = {}, requerAuth = false) {
 
   try {
     const resposta = await fetch(url, {
+      cache: 'no-store',
       ...options,
       signal: controller.signal
     });
@@ -264,16 +265,17 @@ const API = {
       body: JSON.stringify(dados)
     }, true);
   },
-  
+
   /**
-   * Gerar QR Code para evento
+   * Ativar/desativar evento
    */
-  async gerarQRCode() {
-    return requisicaoJSON(`${CONFIG.API_URL}/qrcode/gerar`, {
+  async toggleStatusEvento(id) {
+    return requisicaoJSON(`${CONFIG.API_URL}/eventos/${id}/toggle`, {
+      method: 'PATCH',
       headers: obterHeadersAutenticados()
     }, true);
   },
-  
+
   
   /**
    * ==========================================

@@ -6,7 +6,7 @@
  */
 
 let pollingIntervals = {};
-let pollingPausado = false;
+let pollingConfigs = {}; // guarda nome → { callback, intervalo } para reiniciar
 
 /**
  * Inicia polling
@@ -19,6 +19,9 @@ function iniciarPolling(nome, callback, intervalo = CONFIG.POLLING_INTERVAL) {
   if (pollingIntervals[nome]) {
     pararPolling(nome);
   }
+
+  // Salvar configuração para poder reiniciar após visibilitychange
+  pollingConfigs[nome] = { callback, intervalo };
   
   // Executar imediatamente
   callback();
@@ -48,6 +51,7 @@ function pararTodosPollings() {
     clearInterval(pollingIntervals[nome]);
   });
   pollingIntervals = {};
+  pollingConfigs = {};
   console.log('🛑 Todos os pollings foram parados');
 }
 
@@ -59,17 +63,11 @@ function pollingEstaAtivo(nome) {
 }
 
 /**
- * Pausar polling quando usuário sai da aba (economia de recursos)
+ * Ao voltar para a aba, executa os callbacks imediatamente para atualizar sem esperar o intervalo
  */
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    if (!pollingPausado) {
-      pararTodosPollings();
-      pollingPausado = true;
-      console.log('⏸️ Pollings pausados (aba inativa)');
-    }
-  } else {
-    pollingPausado = false;
+  if (!document.hidden) {
+    Object.values(pollingConfigs).forEach(({ callback }) => callback());
   }
 });
 

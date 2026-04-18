@@ -15,10 +15,10 @@ const CONFIG = {
   /**
    * URL da API do Backend
    * 
-   * Desenvolvimento: http://localhost:5000/api
-   * Produção: https://sua-api.herokuapp.com/api (ou outro servidor)
+   * Usa o mesmo host do frontend, trocando apenas a porta.
+   * Assim funciona tanto no PC (localhost) quanto no celular (IP da rede).
    */
-  API_URL: 'http://localhost:5000/api',
+  API_URL: `http://${window.location.hostname}:5000/api`,
 
   /**
    * Configurações do fluxo de presença via QR Code
