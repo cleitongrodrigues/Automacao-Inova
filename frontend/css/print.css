@@ -1,0 +1,155 @@
+/**
+ * 🖨️ ESTILOS PARA IMPRESSÃO
+ * 
+ * CSS específico para quando o usuário imprime a página.
+ * Remove elementos desnecessários e otimiza o layout para papel.
+ */
+
+@media print {
+  
+  /* === OCULTAR ELEMENTOS DESNECESSÁRIOS === */
+  .navbar,
+  .sidebar,
+  button,
+  .btn,
+  .form-control,
+  input,
+  textarea,
+  select,
+  .no-print,
+  .modal,
+  .alert {
+    display: none !important;
+  }
+  
+  /* === RESET DE CORES (economizar tinta) === */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  body {
+    margin: 0;
+    padding: 1cm;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  
+  /* === TIPOGRAFIA === */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    color: black !important;
+  }
+  
+  h1 { font-size: 18pt; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 14pt; }
+  
+  p, li {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* === TABELAS === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+  
+  table thead {
+    display: table-header-group;
+  }
+  
+  table th,
+  table td {
+    border: 1px solid #333 !important;
+    padding: 8px;
+  }
+  
+  table th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold;
+  }
+  
+  /* === CARDS === */
+  .card {
+    border: 1px solid #333 !important;
+    padding: 10px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+  }
+  
+  /* === BADGES === */
+  .badge {
+    border: 1px solid black !important;
+    padding: 2px 6px;
+  }
+  
+  /* === STATUS === */
+  .card-presente::before {
+    content: "✓ ";
+    font-weight: bold;
+  }
+  
+  .card-ausente::before {
+    content: "✗ ";
+    font-weight: bold;
+  }
+  
+  /* === LINKS === */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #666 !important;
+  }
+  
+  a[href^="#"]:after,
+  a[href^="javascript:"]:after {
+    content: "";
+  }
+  
+  /* === QUEBRAS DE PÁGINA === */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+  
+  /* === CABEÇALHO DE IMPRESSÃO === */
+  @page {
+    margin: 2cm;
+  }
+  
+  .print-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid black;
+    padding-bottom: 10px;
+  }
+  
+  .print-header h1 {
+    margin: 0;
+    font-size: 20pt;
+  }
+  
+  .print-header p {
+    margin: 5px 0 0 0;
+    font-size: 10pt;
+  }
+  
+  /* === RODAPÉ DE IMPRESSÃO === */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 10pt;
+    border-top: 1px solid black;
+    padding-top: 5px;
+  }
+}

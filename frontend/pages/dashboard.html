@@ -1,0 +1,261 @@
+<!-- Dashboard - Lista de Presença em Tempo Real -->
+
+<!-- Cabeçalho -->
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="margin-bottom: 0.5rem;">📊 Dashboard</h1>
+      <p style="color: var(--cor-texto-secundario); margin: 0;">
+        Presenças de hoje - <span id="data-hoje"></span>
+        <span class="badge badge-primary" style="margin-left: 0.5rem;">
+          <span id="status-atualizacao">Atualizando...</span>
+        </span>
+      </p>
+    </div>
+    <div>
+      <button onclick="recarregarDashboard()" class="btn btn-secondary">
+        🔄 Atualizar
+      </button>
+      <button onclick="window.print()" class="btn btn-outline no-print">
+        🖨️ Imprimir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Estatísticas Rápidas -->
+<div class="row" style="margin-bottom: 2rem;">
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-primaria); font-size: 2.5rem; margin: 0;" id="total-alunos">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total de Alunos</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-sucesso); font-size: 2.5rem; margin: 0;" id="total-presentes">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">✓ Presentes</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-erro); font-size: 2.5rem; margin: 0;" id="total-ausentes">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">✗ Ausentes</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-secundaria); font-size: 2.5rem; margin: 0;" id="percentual-presenca">0%</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">% Presença</p>
+    </div>
+  </div>
+</div>
+
+<!-- Busca -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <input 
+    type="text" 
+    id="busca-aluno" 
+    class="form-control" 
+    placeholder="🔍 Buscar aluno por nome..."
+    onkeyup="filtrarAlunos()"
+  >
+</div>
+
+<!-- Lista de Presença -->
+<div id="lista-presenca">
+  <div style="text-align: center; padding: 2rem;">
+    <div class="loading"></div>
+    <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
+      Carregando lista de presença...
+    </p>
+  </div>
+</div>
+
+<script>
+  // Proteger rota
+  if (!protegerRota()) return;
+  
+  // Mostrar data de hoje
+  document.getElementById('data-hoje').textContent = formatarData(new Date());
+  
+  /**
+   * Carrega lista de presença do backend
+   */
+  async function carregarListaPresenca() {
+    try {
+      // ========================================
+      // 🧪 MODO TESTE - Dados mockados
+      // ========================================
+      // Comentar o bloco abaixo quando o backend estiver pronto
+      
+      const presencasFake = [
+        { nome: 'João Silva', cpf: '12345678901', matricula: 'A001', presente: true, hora_registro: new Date().toISOString() },
+        { nome: 'Maria Santos', cpf: '23456789012', matricula: 'A002', presente: true, hora_registro: new Date().toISOString() },
+        { nome: 'Pedro Oliveira', cpf: '34567890123', matricula: 'A003', presente: false },
+        { nome: 'Ana Costa', cpf: '45678901234', matricula: 'A004', presente: true, hora_registro: new Date().toISOString() },
+        { nome: 'Carlos Lima', cpf: '56789012345', matricula: 'A005', presente: false },
+        { nome: 'Julia Ferreira', cpf: '67890123456', matricula: 'A006', presente: true, hora_registro: new Date().toISOString() },
+        { nome: 'Lucas Martins', cpf: '78901234567', matricula: 'A007', presente: false },
+        { nome: 'Beatriz Alves', cpf: '89012345678', matricula: 'A008', presente: true, hora_registro: new Date().toISOString() }
+      ];
+      
+      renderizarPresencas(presencasFake);
+      atualizarEstatisticas(presencasFake);
+      
+      // Atualizar status
+      document.getElementById('status-atualizacao').textContent = '✓ Atualizado (Modo Teste)';
+      setTimeout(() => {
+        document.getElementById('status-atualizacao').textContent = 'Modo Teste';
+      }, 2000);
+      
+      return; // Remover esta linha quando ativar a API real
+      
+      // ========================================
+      // 🔒 API REAL (ativar quando backend estiver pronto)
+      // ========================================
+      /*
+      const resultado = await API.listarPresencas();
+      
+      if (resultado.success) {
+        renderizarPresencas(resultado.presencas);
+        atualizarEstatisticas(resultado.presencas);
+        
+        // Atualizar status
+        document.getElementById('status-atualizacao').textContent = '✓ Atualizado';
+        setTimeout(() => {
+          document.getElementById('status-atualizacao').textContent = 'Ao vivo';
+        }, 2000);
+      } else {
+        mostrarMensagem('error', resultado.message || 'Erro ao carregar presença');
+      }
+      */
+    } catch (error) {
+      console.error('Erro:', error);
+      mostrarMensagem('error', 'Erro ao carregar presença');
+    }
+  }
+  
+  /**
+   * Renderiza lista de presença na tela
+   */
+  function renderizarPresencas(presencas) {
+    const container = document.getElementById('lista-presenca');
+    
+    if (!presencas || presencas.length === 0) {
+      container.innerHTML = `
+        <div class="card" style="text-align: center; padding: 3rem;">
+          <p style="color: var(--cor-texto-secundario); font-size: 1.2rem;">
+            Nenhum aluno cadastrado ainda.
+          </p>
+          <a href="#/alunos" class="btn btn-primary" style="margin-top: 1rem;">
+            Cadastrar Alunos
+          </a>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '<div class="row">';
+    
+    presencas.forEach(p => {
+      const presente = p.presente;
+      const classeCard = presente ? 'card-presente' : 'card-ausente';
+      const icone = presente ? '✓' : '✗';
+      const status = presente ? 'Presente' : 'Ausente';
+      const corStatus = presente ? 'var(--cor-sucesso)' : 'var(--cor-erro)';
+      const hora = presente ? formatarDataHora(p.hora_registro) : '-';
+      
+      html += `
+        <div class="col-3">
+          <div class="card ${classeCard} aluno-card" data-nome="${p.nome.toLowerCase()}">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <h4 style="margin: 0; font-size: 1.1rem;">${p.nome}</h4>
+              <span style="font-size: 1.5rem; color: ${corStatus};">${icone}</span>
+            </div>
+            <p style="color: var(--cor-texto-secundario); font-size: 0.875rem; margin: 0;">
+              CPF: ${formatarCPF(p.cpf)}<br>
+              Matrícula: ${p.matricula}<br>
+              <strong style="color: ${corStatus};">${status}</strong>
+              ${presente ? `<br><small>às ${hora}</small>` : ''}
+            </p>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+  }
+  
+  /**
+   * Atualiza cards de estatísticas
+   */
+  function atualizarEstatisticas(presencas) {
+    const total = presencas.length;
+    const presentes = presencas.filter(p => p.presente).length;
+    const ausentes = total - presentes;
+    const percentual = total > 0 ? Math.round((presentes / total) * 100) : 0;
+    
+    document.getElementById('total-alunos').textContent = total;
+    document.getElementById('total-presentes').textContent = presentes;
+    document.getElementById('total-ausentes').textContent = ausentes;
+    document.getElementById('percentual-presenca').textContent = `${percentual}%`;
+  }
+  
+  /**
+   * Filtra alunos por nome (busca em tempo real)
+   */
+  function filtrarAlunos() {
+    const busca = document.getElementById('busca-aluno').value.toLowerCase();
+    const cards = document.querySelectorAll('.aluno-card');
+    
+    cards.forEach(card => {
+      const nome = card.getAttribute('data-nome');
+      if (nome.includes(busca)) {
+        card.parentElement.style.display = 'block';
+      } else {
+        card.parentElement.style.display = 'none';
+      }
+    });
+  }
+  
+  /**
+   * Recarrega dashboard manualmente
+   */
+  function recarregarDashboard() {
+    carregarListaPresenca();
+    mostrarMensagem('info', 'Lista atualizada!', 2000);
+  }
+  
+  // Carregar lista inicial
+  carregarListaPresenca();
+  
+  // Iniciar atualização automática a cada 10 segundos
+  iniciarPolling('dashboard-presenca', carregarListaPresenca, CONFIG.POLLING_INTERVAL);
+</script>
+
+<style>
+  /* Estilos específicos do dashboard */
+  .aluno-card {
+    transition: var(--transition);
+  }
+  
+  .aluno-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  @media (max-width: 768px) {
+    .col-3 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+  
+  @media print {
+    .aluno-card {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+</style>

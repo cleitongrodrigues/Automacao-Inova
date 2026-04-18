@@ -1,0 +1,145 @@
+/**
+ * 🎨 VARIÁVEIS CSS - IDENTIDADE VISUAL
+ * 
+ * ⭐ ARQUIVO PRINCIPAL PARA MUDAR CORES ⭐
+ * 
+ * Todas as cores do sistema são definidas aqui.
+ * Para mudar a aparência, edite apenas este arquivo!
+ * 
+ * Identidade Visual: Azul Royal + Amarelo Mostarda + Branco
+ */
+
+/* ============================================
+   MODO CLARO (Padrão)
+   ============================================ */
+:root[data-theme="light"] {
+  
+  /* === CORES PRINCIPAIS (Identidade Visual) === */
+  --cor-primaria: #0052CC;           /* 🔵 Azul Royal - Navbar, botões, links */
+  --cor-primaria-hover: #003D99;     /* Azul mais escuro (hover) */
+  --cor-primaria-claro: #4A90E2;     /* Azul claro (bordas, fundos sutis) */
+  
+  --cor-secundaria: #F6C244;         /* 🟡 Amarelo Mostarda - Destaques, badges */
+  --cor-secundaria-hover: #E0AD2C;   /* Amarelo mais escuro (hover) */
+  --cor-secundaria-claro: #FFF3CD;   /* Amarelo clarinho (alertas) */
+  
+  --cor-terciaria: #FFFFFF;          /* ⚪ Branco - Fundos, cards */
+  
+  /* === CORES DE STATUS === */
+  --cor-sucesso: #28a745;            /* 🟢 Verde - Presente ✓ */
+  --cor-sucesso-claro: #d4edda;      /* Verde claro (fundo) */
+  
+  --cor-erro: #dc3545;               /* 🔴 Vermelho - Ausente ✗ */
+  --cor-erro-claro: #f8d7da;         /* Vermelho claro (fundo) */
+  
+  --cor-aviso: #ffc107;              /* 🟡 Amarelo - Pendente ⚠ */
+  --cor-aviso-claro: #fff3cd;        /* Amarelo claro (fundo) */
+  
+  --cor-info: #17a2b8;               /* 🔵 Azul Info - Informações */
+  --cor-info-claro: #d1ecf1;         /* Azul claro (fundo) */
+  
+  /* === FUNDOS === */
+  --cor-fundo: #FFFFFF;              /* Fundo principal branco */
+  --cor-fundo-secundario: #F8F9FA;   /* Cinza clarísimo (alternado) */
+  --cor-fundo-terciario: #E9ECEF;    /* Cinza claro (divisores) */
+  
+  /* === TEXTOS === */
+  --cor-texto: #212529;              /* Texto preto principal */
+  --cor-texto-secundario: #6c757d;   /* Texto cinza (subtítulos) */
+  --cor-texto-terciario: #ADB5BD;    /* Texto cinza claro (placeholders) */
+  
+  /* === COMPONENTES === */
+  --cor-borda: #DEE2E6;              /* Bordas sutis */
+  --cor-borda-hover: var(--cor-primaria-claro);  /* Borda azul (hover) */
+  
+  --sombra: rgba(0, 82, 204, 0.15);  /* Sombra azul suave */
+  --sombra-hover: rgba(0, 82, 204, 0.25);  /* Sombra azul média (hover) */
+  
+  /* === OUTROS === */
+  --border-radius: 8px;              /* Arredondamento padrão */
+  --transition: all 0.3s ease;       /* Transição suave */
+}
+
+
+/* ============================================
+   MODO ESCURO
+   ============================================ */
+:root[data-theme="dark"] {
+  
+  /* === CORES PRINCIPAIS (ajustadas para dark) === */
+  --cor-primaria: #4A90E2;           /* Azul mais claro para contraste */
+  --cor-primaria-hover: #6BACFF;     /* Azul ainda mais claro (hover) */
+  --cor-primaria-claro: #2E6BA8;     /* Azul médio */
+  
+  --cor-secundaria: #FFD966;         /* Amarelo mais claro */
+  --cor-secundaria-hover: #FFE699;   /* Amarelo clarinho (hover) */
+  --cor-secundaria-claro: #674D1B;   /* Amarelo escuro (fundos) */
+  
+  --cor-terciaria: #1E1E1E;          /* Preto suave */
+  
+  /* === CORES DE STATUS === */
+  --cor-sucesso: #34D058;            /* Verde mais vibrante */
+  --cor-sucesso-claro: #1B4D2E;      /* Verde escuro (fundo) */
+  
+  --cor-erro: #F97583;               /* Vermelho mais suave */
+  --cor-erro-claro: #5C2126;         /* Vermelho escuro (fundo) */
+  
+  --cor-aviso: #FFD700;              /* Amarelo ouro */
+  --cor-aviso-claro: #524200;        /* Amarelo muito escuro (fundo) */
+  
+  --cor-info: #58A6FF;               /* Azul claro */
+  --cor-info-claro: #1C3D5A;         /* Azul escuro (fundo) */
+  
+  /* === FUNDOS === */
+  --cor-fundo: #1E1E1E;              /* Fundo escuro principal */
+  --cor-fundo-secundario: #2D2D2D;   /* Cinza escuro (alternado) */
+  --cor-fundo-terciario: #3A3A3A;    /* Cinza médio (divisores) */
+  
+  /* === TEXTOS === */
+  --cor-texto: #F8F9FA;              /* Texto claro principal */
+  --cor-texto-secundario: #ADB5BD;   /* Texto cinza claro */
+  --cor-texto-terciario: #6C757D;    /* Texto cinza (placeholders) */
+  
+  /* === COMPONENTES === */
+  --cor-borda: #444444;              /* Bordas escuras */
+  --cor-borda-hover: var(--cor-primaria);  /* Borda azul (hover) */
+  
+  --sombra: rgba(74, 144, 226, 0.2); /* Sombra azul escura */
+  --sombra-hover: rgba(74, 144, 226, 0.35);  /* Sombra azul média (hover) */
+  
+  /* === OUTROS === */
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+
+/* ============================================
+   APLICAÇÃO DAS VARIÁVEIS
+   (NÃO MODIFICAR - apenas para referência)
+   ============================================ */
+
+/**
+ * COMO USAR AS VARIÁVEIS:
+ * 
+ * Em qualquer arquivo CSS, use assim:
+ * 
+ * .meu-botao {
+ *   background-color: var(--cor-primaria);
+ *   color: var(--cor-terciaria);
+ * }
+ * 
+ * .meu-card {
+ *   background: var(--cor-fundo);
+ *   border: 1px solid var(--cor-borda);
+ *   box-shadow: 0 2px 8px var(--sombra);
+ * }
+ * 
+ * EXEMPLOS DE USO:
+ * 
+ * Botão Azul:     background: var(--cor-primaria)
+ * Botão Amarelo:  background: var(--cor-secundaria)
+ * Fundo Branco:   background: var(--cor-fundo)
+ * Texto Preto:    color: var(--cor-texto)
+ * Borda Sutil:    border: 1px solid var(--cor-borda)
+ * Sombra Suave:   box-shadow: 0 2px 4px var(--sombra)
+ */

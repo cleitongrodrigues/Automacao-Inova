@@ -1,0 +1,148 @@
+<!-- Página de Login Admin -->
+<div style="max-width: 400px; margin: 4rem auto; padding: 0 1rem;">
+  
+  <div class="card" style="padding: 2rem;">
+    <!-- Cabeçalho -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 style="color: var(--cor-primaria); margin-bottom: 0.5rem;">🔐 Login</h1>
+      <p style="color: var(--cor-texto-secundario);">
+        Área restrita para administradores
+      </p>
+    </div>
+    
+    <!-- Formulário -->
+    <form id="form-login" onsubmit="return false;">
+      
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="form-control" 
+          placeholder="seu@email.com"
+          required
+          autocomplete="email"
+        >
+        <span class="form-error" id="erro-email"></span>
+      </div>
+      
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="senha" class="form-label">Senha</label>
+        <input 
+          type="password" 
+          id="senha" 
+          class="form-control" 
+          placeholder="••••••••"
+          required
+          autocomplete="current-password"
+        >
+        <span class="form-error" id="erro-senha"></span>
+      </div>
+      
+      <!-- Lembrar login -->
+      <div class="form-check" style="margin-bottom: 1.5rem;">
+        <input type="checkbox" id="lembrar" class="form-check-input">
+        <label for="lembrar" class="form-check-label">Lembrar-me</label>
+      </div>
+      
+      <!-- Botão Submit -->
+      <button type="submit" class="btn btn-primary btn-block">
+        Entrar
+      </button>
+      
+    </form>
+    
+    <!-- Link esqueceu senha (futuro) -->
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <a href="#" style="color: var(--cor-texto-secundario); font-size: 0.875rem;">
+        Esqueceu a senha?
+      </a>
+    </div>
+  </div>
+  
+  <!-- Informações adicionais -->
+  <div style="text-align: center; margin-top: 2rem; color: var(--cor-texto-secundario); font-size: 0.875rem;">
+    <p>Não tem acesso? Entre em contato com o administrador.</p>
+  </div>
+</div>
+
+<script>
+  // Redirecionar se já estiver autenticado
+  if (estaAutenticado()) {
+    navegar('/dashboard');
+  }
+  
+  // Formulário de Login
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Limpar erros
+    document.getElementById('erro-email').textContent = '';
+    document.getElementById('erro-senha').textContent = '';
+    
+    // Obter valores
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    
+    // Validações básicas (UX)
+    let temErro = false;
+    
+    if (!validarEmail(email)) {
+      document.getElementById('erro-email').textContent = 'Email inválido';
+      temErro = true;
+    }
+    
+    if (campoVazio(senha)) {
+      document.getElementById('erro-senha').textContent = 'Senha é obrigatória';
+      temErro = true;
+    }
+    
+    if (temErro) return;
+    
+    // ========================================
+    // 🧪 MODO TESTE - Login sem backend
+    // ========================================
+    // Comentar o bloco abaixo quando o backend estiver pronto
+    
+    mostrarLoading();
+    
+    // Simular login bem-sucedido
+    const usuarioFake = {
+      id: 1,
+      nome: 'Admin Teste',
+      email: email,
+      nivel_acesso: 'admin'
+    };
+    
+    salvarStorage(CONFIG.STORAGE_KEYS.token, 'fake-jwt-token-123');
+    salvarStorage(CONFIG.STORAGE_KEYS.user, usuarioFake);
+    
+    setTimeout(() => {
+      esconderLoading();
+      mostrarMensagem('success', `Bem-vindo(a), ${usuarioFake.nome}! (Modo Teste)`);
+      
+      setTimeout(() => {
+        navegar('/dashboard');
+      }, 1000);
+    }, 500);
+    
+    return; // Remover esta linha quando ativar o login real
+    
+    // ========================================
+    // 🔒 LOGIN REAL (ativar quando backend estiver pronto)
+    // ========================================
+    /*
+    // Fazer login
+    const resultado = await login(email, senha);
+    
+    if (resultado.success) {
+      // Redirecionar para dashboard
+      setTimeout(() => {
+        navegar('/dashboard');
+      }, 1000);
+    }
+    */
+  });
+</script>

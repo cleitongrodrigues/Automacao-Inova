@@ -1,0 +1,468 @@
+/**
+ * 🧩 COMPONENTES
+ * 
+ * Botões, cards, formulários e outros componentes customizados.
+ * Usa a identidade visual: Azul + Amarelo + Branco
+ */
+
+/* ============================================
+   BOTÕES
+   ============================================ */
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--sombra-hover);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botão Primário (Azul) */
+.btn-primary {
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--cor-primaria-hover);
+  text-decoration: none;
+  color: white;
+}
+
+/* Botão Secundário (Amarelo) */
+.btn-secondary {
+  background-color: var(--cor-secundaria);
+  color: var(--cor-texto);
+}
+
+.btn-secondary:hover {
+  background-color: var(--cor-secundaria-hover);
+  text-decoration: none;
+  color: var(--cor-texto);
+}
+
+/* Botão Sucesso (Verde) */
+.btn-success {
+  background-color: var(--cor-sucesso);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  text-decoration: none;
+  color: white;
+}
+
+/* Botão Erro (Vermelho) */
+.btn-danger {
+  background-color: var(--cor-erro);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  text-decoration: none;
+  color: white;
+}
+
+/* Botão Outline */
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.btn-outline:hover {
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+/* Tamanhos */
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+.btn-lg { padding: 1rem 2rem; font-size: 1.125rem; }
+.btn-block { display: block; width: 100%; }
+
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.card {
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px var(--sombra);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px var(--sombra-hover);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--cor-primaria-claro);
+  color: var(--cor-primaria);
+}
+
+.card-body {
+  color: var(--cor-texto);
+}
+
+.card-footer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  font-size: 0.875rem;
+}
+
+/* Card com status */
+.card-presente {
+  border-left: 4px solid var(--cor-sucesso);
+}
+
+.card-ausente {
+  border-left: 4px solid var(--cor-erro);
+}
+
+.card-pendente {
+  border-left: 4px solid var(--cor-aviso);
+}
+
+
+/* ============================================
+   FORMULÁRIOS
+   ============================================ */
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--cor-texto);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+  outline: none;
+}
+
+.form-control::placeholder {
+  color: var(--cor-texto-terciario);
+}
+
+.form-control:disabled {
+  background-color: var(--cor-fundo-secundario);
+  cursor: not-allowed;
+}
+
+.form-error {
+  color: var(--cor-erro);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-help {
+  color: var(--cor-texto-secundario);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Checkbox e Radio */
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.form-check-label {
+  cursor: pointer;
+  color: var(--cor-texto);
+}
+
+
+/* ============================================
+   BADGES
+   ============================================ */
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.badge-primary { background-color: var(--cor-primaria); color: white; }
+.badge-secondary { background-color: var(--cor-secundaria); color: var(--cor-texto); }
+.badge-success { background-color: var(--cor-sucesso); color: white; }
+.badge-danger { background-color: var(--cor-erro); color: white; }
+.badge-warning { background-color: var(--cor-aviso); color: var(--cor-texto); }
+
+
+/* ============================================
+   ALERTAS
+   ============================================ */
+
+.alert {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+}
+
+.alert-success {
+  background-color: var(--cor-sucesso-claro);
+  border-color: var(--cor-sucesso);
+  color: var(--cor-sucesso);
+}
+
+.alert-error {
+  background-color: var(--cor-erro-claro);
+  border-color: var(--cor-erro);
+  color: var(--cor-erro);
+}
+
+.alert-warning {
+  background-color: var(--cor-aviso-claro);
+  border-color: var(--cor-aviso);
+  color: #856404;
+}
+
+.alert-info {
+  background-color: var(--cor-info-claro);
+  border-color: var(--cor-info);
+  color: var(--cor-info);
+}
+
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+
+.navbar {
+  background-color: var(--cor-primaria);
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 8px var(--sombra);
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  color: var(--cor-secundaria);
+  text-decoration: none;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.navbar-menu a:hover {
+  color: var(--cor-secundaria);
+  text-decoration: none;
+}
+
+
+/* ============================================
+   TABELAS
+   ============================================ */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.table thead {
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.table tbody tr:hover {
+  background-color: var(--cor-fundo-secundario);
+}
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: var(--cor-fundo-secundario);
+}
+
+
+/* ============================================
+   MODAL
+   ============================================ */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--cor-fundo);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: modalSlideDown 0.3s ease-out;
+}
+
+@keyframes modalSlideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cor-primaria);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--cor-texto-secundario);
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  color: var(--cor-erro);
+}
+
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+  .navbar-menu {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.625rem 1.25rem;
+  }
+  
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+}
