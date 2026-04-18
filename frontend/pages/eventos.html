@@ -228,14 +228,14 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
 
 <script>
   // Proteger rota
-  protegerRota();
+  var paginaAutorizadaEventos = protegerRota();
   
-  let filtroAtual = 'todos';
-  let eventosFake = [
+  var filtroAtual = 'todos';
+  var eventosFake = [
     { 
       id: 1, 
       nome: 'Encontro de Sábado - Abril 2026', 
@@ -548,19 +548,32 @@
     
     const link = `${window.location.origin}/index.html#/presenca?token=${evento.token}`;
     document.getElementById('link-presenca').value = link;
+    document.getElementById('modal-qrcode').classList.add('active');
     
     const qrcodeDiv = document.getElementById('qrcode-preview');
     qrcodeDiv.innerHTML = '';
-    
-    QRCode.toCanvas(link, { width: 300, margin: 2 }, (error, canvas) => {
-      if (error) {
-        qrcodeDiv.innerHTML = '<p style="color: var(--cor-erro);">Erro ao gerar QR Code</p>';
-      } else {
-        qrcodeDiv.appendChild(canvas);
-      }
-    });
-    
-    document.getElementById('modal-qrcode').classList.add('active');
+
+    if (!window.QRCode || typeof window.QRCode.toCanvas !== 'function') {
+      qrcodeDiv.innerHTML = `
+        <p style="color: var(--cor-erro); margin-bottom: 1rem;">Biblioteca de QR indisponível.</p>
+        <p style="font-size: 0.875rem; color: var(--cor-texto-secundario); margin: 0;">
+          Use o link abaixo para teste: <a href="${link}" target="_blank" rel="noopener noreferrer">abrir presenca</a>
+        </p>
+      `;
+      return;
+    }
+
+    try {
+      QRCode.toCanvas(link, { width: 300, margin: 2 }, (error, canvas) => {
+        if (error) {
+          qrcodeDiv.innerHTML = '<p style="color: var(--cor-erro);">Erro ao gerar QR Code</p>';
+        } else {
+          qrcodeDiv.appendChild(canvas);
+        }
+      });
+    } catch (error) {
+      qrcodeDiv.innerHTML = '<p style="color: var(--cor-erro);">Falha ao renderizar QR Code.</p>';
+    }
   }
   
   /**
@@ -603,5 +616,7 @@
   }
   
   // Carregar ao iniciar
-  carregarEventos();
+  if (paginaAutorizadaEventos) {
+    carregarEventos();
+  }
 </script>

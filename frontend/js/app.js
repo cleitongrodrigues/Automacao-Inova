@@ -79,7 +79,7 @@ async function carregarPagina(rota) {
     appContainer.innerHTML = html;
     
     // Executar scripts da página (se houver)
-    executarScriptsPagina();
+    await executarScriptsPagina();
     
     // Atualizar navegação ativa
     atualizarNavegacaoAtiva(rota);
@@ -98,13 +98,27 @@ async function carregarPagina(rota) {
 /**
  * Executa scripts inline da página carregada
  */
-function executarScriptsPagina() {
+async function executarScriptsPagina() {
   const scripts = appContainer.querySelectorAll('script');
-  scripts.forEach(scriptAntigo => {
+
+  for (const scriptAntigo of scripts) {
     const scriptNovo = document.createElement('script');
+
+    if (scriptAntigo.src) {
+      // Necessario para telas SPA que dependem de bibliotecas externas (ex.: QRCode CDN).
+      await new Promise((resolve) => {
+        scriptNovo.src = scriptAntigo.src;
+        scriptNovo.async = false;
+        scriptNovo.onload = resolve;
+        scriptNovo.onerror = resolve;
+        scriptAntigo.parentNode.replaceChild(scriptNovo, scriptAntigo);
+      });
+      continue;
+    }
+
     scriptNovo.textContent = scriptAntigo.textContent;
     scriptAntigo.parentNode.replaceChild(scriptNovo, scriptAntigo);
-  });
+  }
 }
 
 /**

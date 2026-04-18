@@ -197,8 +197,9 @@
       // 🔒 API REAL
       // ========================================
       const resultado = await API.validarEventoPorToken(token);
+      const ok = !!(resultado && (resultado.success || resultado.sucesso));
       
-      if (resultado.success && resultado.evento.ativo) {
+      if (ok && resultado.evento && resultado.evento.ativo) {
         eventoAtual = resultado.evento;
         
         document.getElementById('nome-evento').textContent = eventoAtual.nome;
@@ -211,7 +212,7 @@
         document.getElementById('validando-evento').style.display = 'none';
         document.getElementById('formulario-presenca').style.display = 'block';
       } else {
-        mostrarErroEvento(resultado.message || 'Evento inválido ou inativo.');
+        mostrarErroEvento(resultado?.mensagem || resultado?.message || 'Evento inválido ou inativo.');
       }
     } catch (error) {
       console.error('Erro:', error);
@@ -378,11 +379,12 @@
     }
     
     const resultado = await API.registrarPresenca(dados);
+    const ok = !!(resultado && (resultado.success || resultado.sucesso));
     
-    if (resultado.success) {
+    if (ok) {
       concluirSucesso(resultado.aluno?.nome || 'Presença confirmada');
     } else {
-      mostrarMensagem('error', resultado.message || 'Não foi possível registrar presença.');
+      mostrarMensagem('error', resultado?.mensagem || resultado?.message || 'Não foi possível registrar presença.');
     }
   });
   

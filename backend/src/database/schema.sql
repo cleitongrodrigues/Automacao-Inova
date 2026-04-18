@@ -11,3 +11,28 @@ CREATE TABLE IF NOT EXISTS alunos (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS eventos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  data TEXT NOT NULL,
+  horario_inicio TEXT,
+  horario_fim TEXT,
+  qr_code_token TEXT NOT NULL UNIQUE,
+  requer_reconhecimento_facial INTEGER NOT NULL DEFAULT 1,
+  ativo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS presencas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  aluno_id INTEGER NOT NULL,
+  evento_id INTEGER NOT NULL,
+  data_hora_registro TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  status TEXT NOT NULL DEFAULT 'aprovada',
+  foto_selfie TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (aluno_id) REFERENCES alunos(id),
+  FOREIGN KEY (evento_id) REFERENCES eventos(id),
+  UNIQUE (aluno_id, evento_id)
+);

@@ -10,7 +10,7 @@ const CONFIG = {
    * Executa frontend com dados mockados.
    * Defina false quando o backend real estiver disponível.
    */
-  USE_MOCK_DATA: true,
+  USE_MOCK_DATA: false,
 
   /**
    * URL da API do Backend
