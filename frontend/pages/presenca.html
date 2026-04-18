@@ -1,0 +1,391 @@
+<!-- Página Pública de Registro de Presença -->
+
+<div style="max-width: 500px; margin: 2rem auto; padding: 0 1rem;">
+  
+  <!-- Cabeçalho -->
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="color: var(--cor-primaria); margin-bottom: 0.5rem;">✅ Registro de Presença</h1>
+    <p id="nome-evento" style="font-size: 1.1rem; font-weight: bold; margin: 0.5rem 0;"></p>
+    <p id="data-evento" style="color: var(--cor-texto-secundario); margin: 0;"></p>
+  </div>
+  
+  <!-- Card de Validação do Evento -->
+  <div id="validando-evento" class="card" style="text-align: center; padding: 2rem;">
+    <div class="loading"></div>
+    <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
+      Validando evento...
+    </p>
+  </div>
+  
+  <!-- Card de Erro (evento inválido/inativo) -->
+  <div id="erro-evento" class="card" style="text-align: center; padding: 2rem; display: none; border-left: 4px solid var(--cor-erro);">
+    <p style="font-size: 3rem; margin: 0;">🚫</p>
+    <h3 style="color: var(--cor-erro); margin: 1rem 0 0.5rem 0;">Evento Inválido</h3>
+    <p id="mensagem-erro-evento" style="color: var(--cor-texto-secundario); margin: 0;">
+      Este QR Code não é válido ou o evento está inativo.
+    </p>
+  </div>
+  
+  <!-- Formulário de Presença -->
+  <div id="formulario-presenca" class="card" style="display: none;">
+    <form id="form-presenca" onsubmit="return false;">
+      
+      <!-- CPF -->
+      <div class="form-group">
+        <label for="cpf-presenca" class="form-label">
+          CPF <span style="color: var(--cor-erro);">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="cpf-presenca" 
+          class="form-control" 
+          placeholder="000.000.000-00"
+          required
+          maxlength="14"
+          oninput="aplicarMascaraCPF(this)"
+          autocomplete="off"
+        >
+        <span class="form-error" id="erro-cpf-presenca"></span>
+      </div>
+      
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email-presenca" class="form-label">
+          Email <span style="color: var(--cor-erro);">*</span>
+        </label>
+        <input 
+          type="email" 
+          id="email-presenca" 
+          class="form-control" 
+          placeholder="seu@email.com"
+          required
+          autocomplete="email"
+        >
+        <span class="form-error" id="erro-email-presenca"></span>
+      </div>
+      
+      <!-- Seção de Selfie (condicional) -->
+      <div id="secao-selfie" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">
+            📸 Selfie para Reconhecimento Facial <span style="color: var(--cor-erro);">*</span>
+          </label>
+          
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <!-- Preview da Câmera -->
+            <video 
+              id="video-camera" 
+              autoplay 
+              playsinline
+              style="width: 100%; max-width: 300px; border-radius: var(--border-radius); display: none; background: #000;"
+            ></video>
+            
+            <!-- Canvas (foto capturada) -->
+            <canvas 
+              id="canvas-selfie" 
+              style="width: 100%; max-width: 300px; border-radius: var(--border-radius); display: none;"
+            ></canvas>
+            
+            <!-- Placeholder -->
+            <div id="placeholder-camera" style="width: 100%; max-width: 300px; height: 225px; margin: 0 auto; background: var(--cor-fundo-secundario); border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; border: 2px dashed var(--cor-borda);">
+              <span style="color: var(--cor-texto-secundario);">📷 Câmera desligada</span>
+            </div>
+          </div>
+          
+          <div style="text-align: center; display: flex; gap: 0.5rem; justify-content: center;">
+            <button type="button" id="btn-ligar-camera" onclick="ligarCamera()" class="btn btn-secondary">
+              📹 Ligar Câmera
+            </button>
+            <button type="button" id="btn-capturar" onclick="capturarFoto()" class="btn btn-primary" style="display: none;">
+              📸 Capturar Foto
+            </button>
+            <button type="button" id="btn-refazer" onclick="refazerFoto()" class="btn btn-secondary" style="display: none;">
+              🔄 Tirar Outra
+            </button>
+          </div>
+          
+          <small style="color: var(--cor-texto-secundario); display: block; margin-top: 0.5rem; text-align: center;">
+            Posicione seu rosto no centro da câmera
+          </small>
+          <span class="form-error" id="erro-selfie"></span>
+        </div>
+      </div>
+      
+      <!-- Botão Submit -->
+      <button type="submit" class="btn btn-primary btn-block" id="btn-registrar">
+        ✅ Registrar Presença
+      </button>
+      
+    </form>
+  </div>
+  
+  <!-- Card de Sucesso -->
+  <div id="sucesso-presenca" class="card" style="text-align: center; padding: 2rem; display: none; border-left: 4px solid var(--cor-sucesso);">
+    <p style="font-size: 3rem; margin: 0;">✅</p>
+    <h3 style="color: var(--cor-sucesso); margin: 1rem 0 0.5rem 0;">Presença Registrada!</h3>
+    <p style="color: var(--cor-texto-secundario); margin: 0;">
+      Sua presença foi confirmada com sucesso.
+    </p>
+    <p id="nome-aluno-sucesso" style="font-weight: bold; margin: 1rem 0 0 0;"></p>
+  </div>
+  
+</div>
+
+<script>
+  let eventoAtual = null;
+  let streamCamera = null;
+  let fotoCapturada = null;
+  
+  /**
+   * Obter token da URL
+   */
+  function obterTokenURL() {
+    const params = new URLSearchParams(window.location.hash.split('?')[1]);
+    return params.get('token');
+  }
+  
+  /**
+   * Validar evento pelo token
+   */
+  async function validarEvento() {
+    const token = obterTokenURL();
+    
+    if (!token) {
+      mostrarErroEvento('QR Code inválido ou ausente.');
+      return;
+    }
+    
+    try {
+      // ========================================
+      // 🧪 MODO TESTE
+      // ========================================
+      setTimeout(() => {
+        // Simular evento válido
+        const eventoFake = {
+          id: 1,
+          nome: 'Encontro de Sábado - Abril 2026',
+          data: '2026-04-18',
+          horario_inicio: '08:00',
+          horario_fim: '12:00',
+          requer_facial: true,
+          ativo: true,
+          token: token
+        };
+        
+        eventoAtual = eventoFake;
+        
+        // Atualizar informações na tela
+        document.getElementById('nome-evento').textContent = eventoFake.nome;
+        document.getElementById('data-evento').textContent = `📅 ${formatarData(new Date(eventoFake.data + 'T00:00:00'))} | ⏰ ${eventoFake.horario_inicio} - ${eventoFake.horario_fim}`;
+        
+        // Mostrar/esconder seção de selfie
+        if (eventoFake.requer_facial) {
+          document.getElementById('secao-selfie').style.display = 'block';
+        }
+        
+        // Exibir formulário
+        document.getElementById('validando-evento').style.display = 'none';
+        document.getElementById('formulario-presenca').style.display = 'block';
+      }, 1000);
+      
+      return; // Remover quando ativar API real
+      
+      // ========================================
+      // 🔒 API REAL
+      // ========================================
+      /*
+      const resultado = await API.validarEvento(token);
+      
+      if (resultado.success && resultado.evento.ativo) {
+        eventoAtual = resultado.evento;
+        
+        document.getElementById('nome-evento').textContent = eventoAtual.nome;
+        document.getElementById('data-evento').textContent = `📅 ${formatarData(new Date(eventoAtual.data))} | ⏰ ${eventoAtual.horario_inicio} - ${eventoAtual.horario_fim}`;
+        
+        if (eventoAtual.requer_facial) {
+          document.getElementById('secao-selfie').style.display = 'block';
+        }
+        
+        document.getElementById('validando-evento').style.display = 'none';
+        document.getElementById('formulario-presenca').style.display = 'block';
+      } else {
+        mostrarErroEvento(resultado.message || 'Evento inválido ou inativo.');
+      }
+      */
+    } catch (error) {
+      console.error('Erro:', error);
+      mostrarErroEvento('Erro ao validar evento. Tente novamente.');
+    }
+  }
+  
+  /**
+   * Mostrar erro do evento
+   */
+  function mostrarErroEvento(mensagem) {
+    document.getElementById('validando-evento').style.display = 'none';
+    document.getElementById('mensagem-erro-evento').textContent = mensagem;
+    document.getElementById('erro-evento').style.display = 'block';
+  }
+  
+  /**
+   * Ligar câmera
+   */
+  async function ligarCamera() {
+    try {
+      streamCamera = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user' } 
+      });
+      
+      const video = document.getElementById('video-camera');
+      video.srcObject = streamCamera;
+      
+      // Mostrar vídeo
+      document.getElementById('placeholder-camera').style.display = 'none';
+      video.style.display = 'block';
+      
+      // Atualizar botões
+      document.getElementById('btn-ligar-camera').style.display = 'none';
+      document.getElementById('btn-capturar').style.display = 'inline-block';
+      
+    } catch (error) {
+      console.error('Erro ao acessar câmera:', error);
+      mostrarMensagem('error', 'Erro ao acessar câmera. Verifique as permissões.');
+    }
+  }
+  
+  /**
+   * Capturar foto
+   */
+  function capturarFoto() {
+    const video = document.getElementById('video-camera');
+    const canvas = document.getElementById('canvas-selfie');
+    const context = canvas.getContext('2d');
+    
+    // Definir dimensões do canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Desenhar frame atual do vídeo no canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Converter para base64
+    fotoCapturada = canvas.toDataURL('image/jpeg', 0.8);
+    
+    // Parar câmera
+    pararCamera();
+    
+    // Mostrar canvas
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    
+    // Atualizar botões
+    document.getElementById('btn-capturar').style.display = 'none';
+    document.getElementById('btn-refazer').style.display = 'inline-block';
+  }
+  
+  /**
+   * Refazer foto
+   */
+  function refazerFoto() {
+    fotoCapturada = null;
+    document.getElementById('canvas-selfie').style.display = 'none';
+    document.getElementById('btn-refazer').style.display = 'none';
+    ligarCamera();
+  }
+  
+  /**
+   * Parar câmera
+   */
+  function pararCamera() {
+    if (streamCamera) {
+      streamCamera.getTracks().forEach(track => track.stop());
+      streamCamera = null;
+    }
+  }
+  
+  /**
+   * Registrar presença
+   */
+  document.getElementById('form-presenca').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Limpar erros
+    document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    
+    // Obter valores
+    const cpf = document.getElementById('cpf-presenca').value.trim();
+    const email = document.getElementById('email-presenca').value.trim();
+    
+    // Validações básicas
+    let temErro = false;
+    
+    if (!validarFormatoCPF(cpf)) {
+      document.getElementById('erro-cpf-presenca').textContent = 'CPF inválido (use 000.000.000-00)';
+      temErro = true;
+    }
+    
+    if (!validarEmail(email)) {
+      document.getElementById('erro-email-presenca').textContent = 'Email inválido';
+      temErro = true;
+    }
+    
+    // Validar selfie se necessário
+    if (eventoAtual && eventoAtual.requer_facial && !fotoCapturada) {
+      document.getElementById('erro-selfie').textContent = 'Tire uma selfie para continuar';
+      temErro = true;
+    }
+    
+    if (temErro) return;
+    
+    // ========================================
+    // 🧪 MODO TESTE
+    // ========================================
+    mostrarLoading();
+    
+    setTimeout(() => {
+      esconderLoading();
+      
+      // Simular sucesso
+      document.getElementById('formulario-presenca').style.display = 'none';
+      document.getElementById('nome-aluno-sucesso').textContent = 'CPF: ' + cpf;
+      document.getElementById('sucesso-presenca').style.display = 'block';
+      
+      // Parar câmera se ainda estiver ligada
+      pararCamera();
+      
+      mostrarMensagem('success', 'Presença registrada com sucesso!');
+    }, 1500);
+    
+    return; // Remover quando ativar API real
+    
+    // ========================================
+    // 🔒 API REAL
+    // ========================================
+    /*
+    const dados = {
+      cpf: cpf.replace(/\D/g, ''),
+      email,
+      token: obterTokenURL(),
+      selfie: fotoCapturada
+    };
+    
+    const resultado = await API.registrarPresenca(dados);
+    
+    if (resultado.success) {
+      document.getElementById('formulario-presenca').style.display = 'none';
+      document.getElementById('nome-aluno-sucesso').textContent = resultado.aluno.nome;
+      document.getElementById('sucesso-presenca').style.display = 'block';
+      
+      pararCamera();
+    }
+    */
+  });
+  
+  // Limpar câmera ao sair da página
+  window.addEventListener('beforeunload', () => {
+    pararCamera();
+  });
+  
+  // Validar evento ao carregar
+  validarEvento();
+</script>

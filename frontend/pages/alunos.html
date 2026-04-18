@@ -1,0 +1,586 @@
+<!-- Gestão de Alunos - CRUD Completo -->
+
+<!-- Cabeçalho -->
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="margin-bottom: 0.5rem;">👥 Gestão de Alunos</h1>
+      <p style="color: var(--cor-texto-secundario); margin: 0;">
+        Cadastro completo com foto para reconhecimento facial
+      </p>
+    </div>
+    <div>
+      <button onclick="abrirModalNovoAluno()" class="btn btn-primary">
+        ➕ Novo Aluno
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row" style="margin-bottom: 2rem;">
+  <div class="col-4">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-primaria); font-size: 2rem; margin: 0;" id="total-cadastrados">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total Cadastrados</p>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-sucesso); font-size: 2rem; margin: 0;" id="total-com-foto">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Com Foto</p>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-aviso); font-size: 2rem; margin: 0;" id="total-sem-foto">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Sem Foto</p>
+    </div>
+  </div>
+</div>
+
+<!-- Busca -->
+<div class="card" style="margin-bottom: 1.5rem;">
+  <input 
+    type="text" 
+    id="busca-aluno" 
+    class="form-control" 
+    placeholder="🔍 Buscar aluno por nome, CPF ou matrícula..."
+    onkeyup="filtrarTabelaAlunos()"
+  >
+</div>
+
+<!-- Tabela de Alunos -->
+<div class="card">
+  <div class="table-responsive">
+    <table class="table" id="tabela-alunos">
+      <thead>
+        <tr>
+          <th>Foto</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Matrícula</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-alunos">
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem;">
+            <div class="loading"></div>
+            <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
+              Carregando alunos...
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Novo/Editar Aluno -->
+<div id="modal-aluno" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-titulo">Novo Aluno</h3>
+        <button onclick="fecharModalAluno()" class="btn-close">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="form-aluno" onsubmit="return false;">
+          <input type="hidden" id="aluno-id">
+          
+          <!-- Upload de Foto -->
+          <div class="form-group">
+            <label class="form-label">
+              📸 Foto do Aluno <span style="color: var(--cor-erro);">*</span>
+              <small style="color: var(--cor-texto-secundario); font-weight: normal;">
+                (obrigatória para reconhecimento facial)
+              </small>
+            </label>
+            
+            <div style="text-align: center; margin-bottom: 1rem;">
+              <div id="preview-foto" style="width: 150px; height: 150px; margin: 0 auto; border: 2px dashed var(--cor-borda); border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--cor-fundo-secundario);">
+                <span style="color: var(--cor-texto-secundario);">Sem foto</span>
+              </div>
+            </div>
+            
+            <input 
+              type="file" 
+              id="foto-aluno" 
+              class="form-control" 
+              accept="image/*"
+              onchange="previewFoto(event)"
+            >
+            <small style="color: var(--cor-texto-secundario);">
+              Formatos: JPG, PNG. Tamanho máximo: 2MB
+            </small>
+          </div>
+          
+          <!-- Nome -->
+          <div class="form-group">
+            <label for="nome" class="form-label">
+              Nome Completo <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="nome" 
+              class="form-control" 
+              placeholder="João Silva"
+              required
+            >
+            <span class="form-error" id="erro-nome"></span>
+          </div>
+          
+          <!-- CPF -->
+          <div class="form-group">
+            <label for="cpf" class="form-label">
+              CPF <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="cpf" 
+              class="form-control" 
+              placeholder="000.000.000-00"
+              required
+              maxlength="14"
+              oninput="aplicarMascaraCPF(this)"
+            >
+            <span class="form-error" id="erro-cpf"></span>
+          </div>
+          
+          <!-- Matrícula -->
+          <div class="form-group">
+            <label for="matricula" class="form-label">
+              Matrícula <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="matricula" 
+              class="form-control" 
+              placeholder="A001"
+              required
+            >
+            <span class="form-error" id="erro-matricula"></span>
+          </div>
+          
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email-aluno" class="form-label">
+              Email <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="email" 
+              id="email-aluno" 
+              class="form-control" 
+              placeholder="joao@email.com"
+              required
+            >
+            <span class="form-error" id="erro-email-aluno"></span>
+          </div>
+          
+          <!-- Telefone -->
+          <div class="form-group">
+            <label for="telefone" class="form-label">Telefone</label>
+            <input 
+              type="text" 
+              id="telefone" 
+              class="form-control" 
+              placeholder="(11) 98765-4321"
+              maxlength="15"
+              oninput="aplicarMascaraTelefone(this)"
+            >
+          </div>
+          
+        </form>
+      </div>
+      
+      <div class="modal-footer">
+        <button onclick="fecharModalAluno()" class="btn btn-secondary">
+          Cancelar
+        </button>
+        <button onclick="salvarAluno()" class="btn btn-primary">
+          💾 Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmação Exclusão -->
+<div id="modal-excluir" class="modal">
+  <div class="modal-dialog" style="max-width: 400px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Confirmar Exclusão</h3>
+        <button onclick="fecharModalExcluir()" class="btn-close">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <p style="text-align: center; font-size: 3rem; margin: 0;">⚠️</p>
+        <p style="text-align: center; margin-top: 1rem;">
+          Tem certeza que deseja excluir o aluno <strong id="nome-excluir"></strong>?
+        </p>
+        <p style="text-align: center; color: var(--cor-erro); font-size: 0.875rem;">
+          Esta ação não pode ser desfeita!
+        </p>
+      </div>
+      
+      <div class="modal-footer">
+        <button onclick="fecharModalExcluir()" class="btn btn-secondary">
+          Cancelar
+        </button>
+        <button onclick="confirmarExclusao()" class="btn btn-danger">
+          🗑️ Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Proteger rota
+  if (!protegerRota()) return;
+  
+  let alunoParaExcluir = null;
+  let alunosFake = [
+    { id: 1, nome: 'João Silva', cpf: '123.456.789-01', matricula: 'A001', email: 'joao@email.com', telefone: '(11) 98765-4321', foto: true },
+    { id: 2, nome: 'Maria Santos', cpf: '234.567.890-12', matricula: 'A002', email: 'maria@email.com', telefone: '(11) 98765-4322', foto: true },
+    { id: 3, nome: 'Pedro Oliveira', cpf: '345.678.901-23', matricula: 'A003', email: 'pedro@email.com', telefone: '', foto: false },
+    { id: 4, nome: 'Ana Costa', cpf: '456.789.012-34', matricula: 'A004', email: 'ana@email.com', telefone: '(11) 98765-4324', foto: true },
+  ];
+  
+  /**
+   * Carrega lista de alunos
+   */
+  async function carregarAlunos() {
+    try {
+      // ========================================
+      // 🧪 MODO TESTE - Dados mockados
+      // ========================================
+      renderizarTabelaAlunos(alunosFake);
+      atualizarEstatisticasAlunos(alunosFake);
+      return; // Remover quando ativar API real
+      
+      // ========================================
+      // 🔒 API REAL (ativar quando backend estiver pronto)
+      // ========================================
+      /*
+      const resultado = await API.listarAlunos();
+      
+      if (resultado.success) {
+        renderizarTabelaAlunos(resultado.alunos);
+        atualizarEstatisticasAlunos(resultado.alunos);
+      } else {
+        mostrarMensagem('error', resultado.message || 'Erro ao carregar alunos');
+      }
+      */
+    } catch (error) {
+      console.error('Erro:', error);
+      mostrarMensagem('error', 'Erro ao carregar alunos');
+    }
+  }
+  
+  /**
+   * Renderiza tabela de alunos
+   */
+  function renderizarTabelaAlunos(alunos) {
+    const tbody = document.getElementById('tbody-alunos');
+    
+    if (!alunos || alunos.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--cor-texto-secundario); font-size: 1.2rem;">
+              Nenhum aluno cadastrado ainda.
+            </p>
+            <button onclick="abrirModalNovoAluno()" class="btn btn-primary" style="margin-top: 1rem;">
+              ➕ Cadastrar Primeiro Aluno
+            </button>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = alunos.map(aluno => `
+      <tr data-aluno-id="${aluno.id}">
+        <td>
+          <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--cor-fundo-secundario); display: flex; align-items: center; justify-content: center;">
+            ${aluno.foto ? '📸' : '👤'}
+          </div>
+        </td>
+        <td><strong>${aluno.nome}</strong></td>
+        <td>${aluno.cpf}</td>
+        <td>${aluno.matricula}</td>
+        <td>${aluno.email}</td>
+        <td>${aluno.telefone || '-'}</td>
+        <td>
+          <button onclick="editarAluno(${aluno.id})" class="btn btn-sm btn-secondary" title="Editar">
+            ✏️
+          </button>
+          <button onclick="abrirModalExcluir(${aluno.id}, '${aluno.nome}')" class="btn btn-sm btn-danger" title="Excluir">
+            🗑️
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  /**
+   * Atualiza estatísticas
+   */
+  function atualizarEstatisticasAlunos(alunos) {
+    const total = alunos.length;
+    const comFoto = alunos.filter(a => a.foto).length;
+    const semFoto = total - comFoto;
+    
+    document.getElementById('total-cadastrados').textContent = total;
+    document.getElementById('total-com-foto').textContent = comFoto;
+    document.getElementById('total-sem-foto').textContent = semFoto;
+  }
+  
+  /**
+   * Filtrar tabela
+   */
+  function filtrarTabelaAlunos() {
+    const busca = document.getElementById('busca-aluno').value.toLowerCase();
+    const linhas = document.querySelectorAll('#tbody-alunos tr');
+    
+    linhas.forEach(linha => {
+      const texto = linha.textContent.toLowerCase();
+      linha.style.display = texto.includes(busca) ? '' : 'none';
+    });
+  }
+  
+  /**
+   * Abrir modal novo aluno
+   */
+  function abrirModalNovoAluno() {
+    document.getElementById('modal-titulo').textContent = 'Novo Aluno';
+    document.getElementById('form-aluno').reset();
+    document.getElementById('aluno-id').value = '';
+    document.getElementById('preview-foto').innerHTML = '<span style="color: var(--cor-texto-secundario);">Sem foto</span>';
+    
+    // Limpar erros
+    document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    
+    document.getElementById('modal-aluno').classList.add('active');
+  }
+  
+  /**
+   * Fechar modal
+   */
+  function fecharModalAluno() {
+    document.getElementById('modal-aluno').classList.remove('active');
+  }
+  
+  /**
+   * Preview da foto
+   */
+  function previewFoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validar tamanho (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      mostrarMensagem('error', 'Foto muito grande! Máximo 2MB');
+      event.target.value = '';
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('preview-foto').innerHTML = `
+        <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
+      `;
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  /**
+   * Salvar aluno
+   */
+  async function salvarAluno() {
+    // Limpar erros
+    document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    
+    // Obter valores
+    const id = document.getElementById('aluno-id').value;
+    const nome = document.getElementById('nome').value.trim();
+    const cpf = document.getElementById('cpf').value.trim();
+    const matricula = document.getElementById('matricula').value.trim();
+    const email = document.getElementById('email-aluno').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const fotoInput = document.getElementById('foto-aluno');
+    
+    // Validações básicas (UX)
+    let temErro = false;
+    
+    if (campoVazio(nome)) {
+      document.getElementById('erro-nome').textContent = 'Nome é obrigatório';
+      temErro = true;
+    }
+    
+    if (!validarFormatoCPF(cpf)) {
+      document.getElementById('erro-cpf').textContent = 'CPF inválido (use 000.000.000-00)';
+      temErro = true;
+    }
+    
+    if (campoVazio(matricula)) {
+      document.getElementById('erro-matricula').textContent = 'Matrícula é obrigatória';
+      temErro = true;
+    }
+    
+    if (!validarEmail(email)) {
+      document.getElementById('erro-email-aluno').textContent = 'Email inválido';
+      temErro = true;
+    }
+    
+    if (!id && !fotoInput.files[0]) {
+      mostrarMensagem('error', 'Foto é obrigatória para cadastro');
+      temErro = true;
+    }
+    
+    if (temErro) return;
+    
+    // ========================================
+    // 🧪 MODO TESTE - Salvar localmente
+    // ========================================
+    mostrarLoading();
+    
+    setTimeout(() => {
+      if (id) {
+        // Editar
+        const index = alunosFake.findIndex(a => a.id == id);
+        if (index !== -1) {
+          alunosFake[index] = { 
+            ...alunosFake[index], 
+            nome, cpf, matricula, email, telefone,
+            foto: fotoInput.files[0] ? true : alunosFake[index].foto
+          };
+        }
+        mostrarMensagem('success', 'Aluno atualizado com sucesso!');
+      } else {
+        // Criar
+        const novoId = Math.max(...alunosFake.map(a => a.id)) + 1;
+        alunosFake.push({ 
+          id: novoId, 
+          nome, cpf, matricula, email, telefone, 
+          foto: true 
+        });
+        mostrarMensagem('success', 'Aluno cadastrado com sucesso!');
+      }
+      
+      esconderLoading();
+      fecharModalAluno();
+      carregarAlunos();
+    }, 500);
+    
+    return; // Remover quando ativar API real
+    
+    // ========================================
+    // 🔒 API REAL (ativar quando backend estiver pronto)
+    // ========================================
+    /*
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('cpf', cpf);
+    formData.append('matricula', matricula);
+    formData.append('email', email);
+    formData.append('telefone', telefone);
+    
+    if (fotoInput.files[0]) {
+      formData.append('foto', fotoInput.files[0]);
+    }
+    
+    const resultado = id 
+      ? await API.atualizarAluno(id, formData)
+      : await API.criarAluno(formData);
+    
+    if (resultado.success) {
+      fecharModalAluno();
+      carregarAlunos();
+    }
+    */
+  }
+  
+  /**
+   * Editar aluno
+   */
+  function editarAluno(id) {
+    const aluno = alunosFake.find(a => a.id === id);
+    if (!aluno) return;
+    
+    document.getElementById('modal-titulo').textContent = 'Editar Aluno';
+    document.getElementById('aluno-id').value = aluno.id;
+    document.getElementById('nome').value = aluno.nome;
+    document.getElementById('cpf').value = aluno.cpf;
+    document.getElementById('matricula').value = aluno.matricula;
+    document.getElementById('email-aluno').value = aluno.email;
+    document.getElementById('telefone').value = aluno.telefone || '';
+    
+    if (aluno.foto) {
+      document.getElementById('preview-foto').innerHTML = '📸 <small>Foto cadastrada</small>';
+    }
+    
+    document.getElementById('modal-aluno').classList.add('active');
+  }
+  
+  /**
+   * Abrir modal de exclusão
+   */
+  function abrirModalExcluir(id, nome) {
+    alunoParaExcluir = id;
+    document.getElementById('nome-excluir').textContent = nome;
+    document.getElementById('modal-excluir').classList.add('active');
+  }
+  
+  /**
+   * Fechar modal de exclusão
+   */
+  function fecharModalExcluir() {
+    document.getElementById('modal-excluir').classList.remove('active');
+    alunoParaExcluir = null;
+  }
+  
+  /**
+   * Confirmar exclusão
+   */
+  async function confirmarExclusao() {
+    if (!alunoParaExcluir) return;
+    
+    // ========================================
+    // 🧪 MODO TESTE
+    // ========================================
+    mostrarLoading();
+    
+    setTimeout(() => {
+      alunosFake = alunosFake.filter(a => a.id !== alunoParaExcluir);
+      
+      esconderLoading();
+      fecharModalExcluir();
+      carregarAlunos();
+      mostrarMensagem('success', 'Aluno excluído com sucesso!');
+    }, 500);
+    
+    return; // Remover quando ativar API real
+    
+    // ========================================
+    // 🔒 API REAL
+    // ========================================
+    /*
+    const resultado = await API.excluirAluno(alunoParaExcluir);
+    
+    if (resultado.success) {
+      fecharModalExcluir();
+      carregarAlunos();
+    }
+    */
+  }
+  
+  // Carregar ao iniciar
+  carregarAlunos();
+</script>

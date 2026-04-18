@@ -1,0 +1,609 @@
+<!-- Gestão de Eventos - CRUD e Geração de QR Code -->
+
+<!-- Cabeçalho -->
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="margin-bottom: 0.5rem;">📅 Gestão de Eventos</h1>
+      <p style="color: var(--cor-texto-secundario); margin: 0;">
+        Criar eventos e gerar QR Codes para registro de presença
+      </p>
+    </div>
+    <div>
+      <button onclick="abrirModalNovoEvento()" class="btn btn-primary">
+        ➕ Novo Evento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Evento Atual (Destaque) -->
+<div id="evento-atual-card" class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--cor-primaria); background: linear-gradient(135deg, var(--cor-fundo) 0%, var(--cor-fundo-secundario) 100%);">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 2rem;">
+    <div style="flex: 1;">
+      <h2 style="margin-bottom: 0.5rem;">🎯 Evento Ativo Hoje</h2>
+      <p id="evento-atual-nome" style="font-size: 1.2rem; margin: 0.5rem 0;">-</p>
+      <p id="evento-atual-data" style="color: var(--cor-texto-secundario); margin: 0;">-</p>
+    </div>
+    <div style="text-align: center;">
+      <div id="qrcode-atual" style="background: white; padding: 1rem; border-radius: var(--border-radius); box-shadow: var(--sombra);">
+        <p style="color: var(--cor-texto-secundario); margin: 0;">Nenhum evento ativo</p>
+      </div>
+      <button id="btn-download-qr-atual" onclick="downloadQRCode('qrcode-atual', 'evento-atual.png')" class="btn btn-sm btn-secondary" style="margin-top: 1rem; display: none;">
+        ⬇️ Baixar QR Code
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de Eventos -->
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h3 style="margin: 0;">Todos os Eventos</h3>
+    <div class="btn-group">
+      <button onclick="filtrarEventos('todos')" class="btn btn-sm btn-outline" id="filtro-todos">
+        Todos
+      </button>
+      <button onclick="filtrarEventos('ativos')" class="btn btn-sm btn-outline" id="filtro-ativos">
+        Ativos
+      </button>
+      <button onclick="filtrarEventos('inativos')" class="btn btn-sm btn-outline" id="filtro-inativos">
+        Inativos
+      </button>
+    </div>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Nome</th>
+          <th>Status</th>
+          <th>Reconhecimento Facial</th>
+          <th>QR Code</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-eventos">
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 2rem;">
+            <div class="loading"></div>
+            <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
+              Carregando eventos...
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal Novo/Editar Evento -->
+<div id="modal-evento" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-titulo">Novo Evento</h3>
+        <button onclick="fecharModalEvento()" class="btn-close">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="form-evento" onsubmit="return false;">
+          <input type="hidden" id="evento-id">
+          
+          <!-- Nome do Evento -->
+          <div class="form-group">
+            <label for="nome-evento" class="form-label">
+              Nome do Evento <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="nome-evento" 
+              class="form-control" 
+              placeholder="Encontro de Sábado - Abril 2026"
+              required
+            >
+            <span class="form-error" id="erro-nome-evento"></span>
+          </div>
+          
+          <!-- Data -->
+          <div class="form-group">
+            <label for="data-evento" class="form-label">
+              Data (Sábado) <span style="color: var(--cor-erro);">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="data-evento" 
+              class="form-control" 
+              required
+              onchange="validarSabado(this)"
+            >
+            <small style="color: var(--cor-texto-secundario);">
+              Apenas sábados são permitidos
+            </small>
+            <span class="form-error" id="erro-data-evento"></span>
+          </div>
+          
+          <!-- Horário Início -->
+          <div class="form-group">
+            <label for="horario-inicio" class="form-label">Horário de Início</label>
+            <input 
+              type="time" 
+              id="horario-inicio" 
+              class="form-control" 
+              value="08:00"
+            >
+          </div>
+          
+          <!-- Horário Fim -->
+          <div class="form-group">
+            <label for="horario-fim" class="form-label">Horário de Término</label>
+            <input 
+              type="time" 
+              id="horario-fim" 
+              class="form-control" 
+              value="12:00"
+            >
+          </div>
+          
+          <!-- Reconhecimento Facial -->
+          <div class="form-group">
+            <div class="form-check">
+              <input type="checkbox" id="requer-facial" class="form-check-input">
+              <label for="requer-facial" class="form-check-label">
+                <strong>🔐 Requer Reconhecimento Facial</strong>
+                <br>
+                <small style="color: var(--cor-texto-secundario);">
+                  Alunos precisarão tirar selfie ao registrar presença
+                </small>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Descrição -->
+          <div class="form-group">
+            <label for="descricao-evento" class="form-label">Descrição (opcional)</label>
+            <textarea 
+              id="descricao-evento" 
+              class="form-control" 
+              rows="3"
+              placeholder="Informações adicionais sobre o evento..."
+            ></textarea>
+          </div>
+          
+        </form>
+      </div>
+      
+      <div class="modal-footer">
+        <button onclick="fecharModalEvento()" class="btn btn-secondary">
+          Cancelar
+        </button>
+        <button onclick="salvarEvento()" class="btn btn-primary">
+          💾 Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Preview QR Code -->
+<div id="modal-qrcode" class="modal">
+  <div class="modal-dialog" style="max-width: 500px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>QR Code do Evento</h3>
+        <button onclick="fecharModalQRCode()" class="btn-close">&times;</button>
+      </div>
+      
+      <div class="modal-body" style="text-align: center;">
+        <h4 id="qrcode-evento-nome" style="margin-bottom: 1rem;"></h4>
+        <div id="qrcode-preview" style="display: inline-block; background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--sombra);">
+          <!-- QR Code será gerado aqui -->
+        </div>
+        
+        <div style="margin-top: 2rem; padding: 1rem; background: var(--cor-fundo-secundario); border-radius: var(--border-radius);">
+          <p style="margin: 0; font-size: 0.875rem; color: var(--cor-texto-secundario);">
+            <strong>Link de Acesso:</strong>
+          </p>
+          <input 
+            type="text" 
+            id="link-presenca" 
+            class="form-control" 
+            readonly
+            style="margin-top: 0.5rem; font-family: monospace; font-size: 0.75rem;"
+          >
+          <button onclick="copiarLink()" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem;">
+            📋 Copiar Link
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button onclick="downloadQRCode('qrcode-preview', 'qrcode-evento.png')" class="btn btn-primary">
+          ⬇️ Baixar QR Code
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+<script>
+  // Proteger rota
+  if (!protegerRota()) return;
+  
+  let filtroAtual = 'todos';
+  let eventosFake = [
+    { 
+      id: 1, 
+      nome: 'Encontro de Sábado - Abril 2026', 
+      data: '2026-04-18', 
+      horario_inicio: '08:00', 
+      horario_fim: '12:00',
+      requer_facial: true, 
+      ativo: true,
+      token: 'ABC123XYZ'
+    },
+    { 
+      id: 2, 
+      nome: 'Encontro de Sábado - Abril 2026', 
+      data: '2026-04-11', 
+      horario_inicio: '08:00', 
+      horario_fim: '12:00',
+      requer_facial: false, 
+      ativo: false,
+      token: 'DEF456UVW'
+    },
+    { 
+      id: 3, 
+      nome: 'Encontro de Sábado - Abril 2026', 
+      data: '2026-04-25', 
+      horario_inicio: '08:00', 
+      horario_fim: '12:00',
+      requer_facial: true, 
+      ativo: false,
+      token: 'GHI789RST'
+    }
+  ];
+  
+  /**
+   * Carregar eventos
+   */
+  async function carregarEventos() {
+    try {
+      // ========================================
+      // 🧪 MODO TESTE
+      // ========================================
+      renderizarTabelaEventos(eventosFake);
+      mostrarEventoAtual(eventosFake);
+      return; // Remover quando ativar API real
+      
+      // ========================================
+      // 🔒 API REAL
+      // ========================================
+      /*
+      const resultado = await API.listarEventos();
+      
+      if (resultado.success) {
+        renderizarTabelaEventos(resultado.eventos);
+        mostrarEventoAtual(resultado.eventos);
+      }
+      */
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  }
+  
+  /**
+   * Mostra evento ativo hoje
+   */
+  function mostrarEventoAtual(eventos) {
+    const hoje = new Date().toISOString().split('T')[0];
+    const eventoHoje = eventos.find(e => e.data === hoje && e.ativo);
+    
+    if (eventoHoje) {
+      document.getElementById('evento-atual-nome').textContent = eventoHoje.nome;
+      document.getElementById('evento-atual-data').textContent = `📅 ${formatarData(new Date(eventoHoje.data + 'T00:00:00'))} | ⏰ ${eventoHoje.horario_inicio} - ${eventoHoje.horario_fim}`;
+      
+      // Gerar QR Code
+      const link = `${window.location.origin}/index.html#/presenca?token=${eventoHoje.token}`;
+      const qrcodeDiv = document.getElementById('qrcode-atual');
+      qrcodeDiv.innerHTML = '';
+      
+      QRCode.toCanvas(link, { width: 200, margin: 2 }, (error, canvas) => {
+        if (error) {
+          qrcodeDiv.innerHTML = '<p style="color: var(--cor-erro);">Erro ao gerar QR Code</p>';
+        } else {
+          qrcodeDiv.appendChild(canvas);
+        }
+      });
+      
+      document.getElementById('btn-download-qr-atual').style.display = 'inline-block';
+    } else {
+      document.getElementById('evento-atual-nome').textContent = 'Nenhum evento ativo hoje';
+      document.getElementById('evento-atual-data').textContent = 'Crie um evento para esta data';
+      document.getElementById('qrcode-atual').innerHTML = '<p style="color: var(--cor-texto-secundario); margin: 0;">Sem QR Code</p>';
+      document.getElementById('btn-download-qr-atual').style.display = 'none';
+    }
+  }
+  
+  /**
+   * Renderiza tabela de eventos
+   */
+  function renderizarTabelaEventos(eventos) {
+    const tbody = document.getElementById('tbody-eventos');
+    
+    // Filtrar
+    let eventosFiltrados = eventos;
+    if (filtroAtual === 'ativos') {
+      eventosFiltrados = eventos.filter(e => e.ativo);
+    } else if (filtroAtual === 'inativos') {
+      eventosFiltrados = eventos.filter(e => !e.ativo);
+    }
+    
+    // Ordenar por data (mais recente primeiro)
+    eventosFiltrados.sort((a, b) => new Date(b.data) - new Date(a.data));
+    
+    if (eventosFiltrados.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--cor-texto-secundario);">
+              Nenhum evento ${filtroAtual !== 'todos' ? filtroAtual : 'cadastrado'} ainda.
+            </p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = eventosFiltrados.map(evento => `
+      <tr>
+        <td><strong>${formatarData(new Date(evento.data + 'T00:00:00'))}</strong></td>
+        <td>${evento.nome}</td>
+        <td>
+          <span class="badge ${evento.ativo ? 'badge-success' : 'badge-secondary'}">
+            ${evento.ativo ? '✓ Ativo' : '✗ Inativo'}
+          </span>
+        </td>
+        <td>
+          ${evento.requer_facial ? '🔐 Sim' : '- Não'}
+        </td>
+        <td>
+          <button onclick="visualizarQRCode(${evento.id})" class="btn btn-sm btn-secondary">
+            📱 Ver QR
+          </button>
+        </td>
+        <td>
+          <button onclick="editarEvento(${evento.id})" class="btn btn-sm btn-secondary" title="Editar">
+            ✏️
+          </button>
+          <button onclick="toggleStatusEvento(${evento.id})" class="btn btn-sm ${evento.ativo ? 'btn-danger' : 'btn-success'}" title="${evento.ativo ? 'Desativar' : 'Ativar'}">
+            ${evento.ativo ? '🔒' : '✅'}
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  /**
+   * Filtrar eventos
+   */
+  function filtrarEventos(filtro) {
+    filtroAtual = filtro;
+    
+    // Atualizar botões
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline');
+    });
+    document.getElementById(`filtro-${filtro}`).classList.remove('btn-outline');
+    document.getElementById(`filtro-${filtro}`).classList.add('btn-primary');
+    
+    renderizarTabelaEventos(eventosFake);
+  }
+  
+  /**
+   * Validar se é sábado
+   */
+  function validarSabado(input) {
+    const data = new Date(input.value + 'T00:00:00');
+    const diaSemana = data.getDay();
+    
+    if (diaSemana !== 6) { // 6 = Sábado
+      document.getElementById('erro-data-evento').textContent = 'Selecione um sábado!';
+      input.value = '';
+    } else {
+      document.getElementById('erro-data-evento').textContent = '';
+    }
+  }
+  
+  /**
+   * Abrir modal novo evento
+   */
+  function abrirModalNovoEvento() {
+    document.getElementById('modal-titulo').textContent = 'Novo Evento';
+    document.getElementById('form-evento').reset();
+    document.getElementById('evento-id').value = '';
+    document.getElementById('requer-facial').checked = true; // Padrão: SIM
+    
+    // Sugerir próximo sábado
+    const hoje = new Date();
+    const diasAteProximoSabado = (6 - hoje.getDay() + 7) % 7 || 7;
+    const proximoSabado = new Date(hoje.getTime() + diasAteProximoSabado * 24 * 60 * 60 * 1000);
+    document.getElementById('data-evento').value = proximoSabado.toISOString().split('T')[0];
+    
+    document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    document.getElementById('modal-evento').classList.add('active');
+  }
+  
+  /**
+   * Fechar modal
+   */
+  function fecharModalEvento() {
+    document.getElementById('modal-evento').classList.remove('active');
+  }
+  
+  /**
+   * Salvar evento
+   */
+  async function salvarEvento() {
+    const id = document.getElementById('evento-id').value;
+    const nome = document.getElementById('nome-evento').value.trim();
+    const data = document.getElementById('data-evento').value;
+    const horarioInicio = document.getElementById('horario-inicio').value;
+    const horarioFim = document.getElementById('horario-fim').value;
+    const requerFacial = document.getElementById('requer-facial').checked;
+    const descricao = document.getElementById('descricao-evento').value.trim();
+    
+    // Validações
+    if (campoVazio(nome)) {
+      document.getElementById('erro-nome-evento').textContent = 'Nome é obrigatório';
+      return;
+    }
+    
+    if (campoVazio(data)) {
+      document.getElementById('erro-data-evento').textContent = 'Data é obrigatória';
+      return;
+    }
+    
+    // ========================================
+    // 🧪 MODO TESTE
+    // ========================================
+    mostrarLoading();
+    
+    setTimeout(() => {
+      if (id) {
+        // Editar
+        const index = eventosFake.findIndex(e => e.id == id);
+        if (index !== -1) {
+          eventosFake[index] = { 
+            ...eventosFake[index], 
+            nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim, 
+            requer_facial: requerFacial, descricao
+          };
+        }
+        mostrarMensagem('success', 'Evento atualizado!');
+      } else {
+        // Criar
+        const novoId = Math.max(...eventosFake.map(e => e.id)) + 1;
+        const token = Math.random().toString(36).substring(2, 15);
+        eventosFake.push({ 
+          id: novoId, 
+          nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim,
+          requer_facial: requerFacial, descricao,
+          ativo: false,
+          token
+        });
+        mostrarMensagem('success', 'Evento criado com sucesso!');
+      }
+      
+      esconderLoading();
+      fecharModalEvento();
+      carregarEventos();
+    }, 500);
+  }
+  
+  /**
+   * Editar evento
+   */
+  function editarEvento(id) {
+    const evento = eventosFake.find(e => e.id === id);
+    if (!evento) return;
+    
+    document.getElementById('modal-titulo').textContent = 'Editar Evento';
+    document.getElementById('evento-id').value = evento.id;
+    document.getElementById('nome-evento').value = evento.nome;
+    document.getElementById('data-evento').value = evento.data;
+    document.getElementById('horario-inicio').value = evento.horario_inicio;
+    document.getElementById('horario-fim').value = evento.horario_fim;
+    document.getElementById('requer-facial').checked = evento.requer_facial;
+    document.getElementById('descricao-evento').value = evento.descricao || '';
+    
+    document.getElementById('modal-evento').classList.add('active');
+  }
+  
+  /**
+   * Toggle status ativo/inativo
+   */
+  function toggleStatusEvento(id) {
+    const evento = eventosFake.find(e => e.id === id);
+    if (!evento) return;
+    
+    evento.ativo = !evento.ativo;
+    mostrarMensagem('success', `Evento ${evento.ativo ? 'ativado' : 'desativado'}!`);
+    carregarEventos();
+  }
+  
+  /**
+   * Visualizar QR Code
+   */
+  function visualizarQRCode(id) {
+    const evento = eventosFake.find(e => e.id === id);
+    if (!evento) return;
+    
+    document.getElementById('qrcode-evento-nome').textContent = evento.nome;
+    
+    const link = `${window.location.origin}/index.html#/presenca?token=${evento.token}`;
+    document.getElementById('link-presenca').value = link;
+    
+    const qrcodeDiv = document.getElementById('qrcode-preview');
+    qrcodeDiv.innerHTML = '';
+    
+    QRCode.toCanvas(link, { width: 300, margin: 2 }, (error, canvas) => {
+      if (error) {
+        qrcodeDiv.innerHTML = '<p style="color: var(--cor-erro);">Erro ao gerar QR Code</p>';
+      } else {
+        qrcodeDiv.appendChild(canvas);
+      }
+    });
+    
+    document.getElementById('modal-qrcode').classList.add('active');
+  }
+  
+  /**
+   * Fechar modal QR Code
+   */
+  function fecharModalQRCode() {
+    document.getElementById('modal-qrcode').classList.remove('active');
+  }
+  
+  /**
+   * Copiar link
+   */
+  function copiarLink() {
+    const input = document.getElementById('link-presenca');
+    input.select();
+    document.execCommand('copy');
+    mostrarMensagem('success', 'Link copiado!');
+  }
+  
+  /**
+   * Download QR Code
+   */
+  function downloadQRCode(divId, nomearquivo) {
+    const canvas = document.querySelector(`#${divId} canvas`);
+    if (!canvas) {
+      mostrarMensagem('error', 'QR Code não encontrado');
+      return;
+    }
+    
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      mostrarMensagem('success', 'QR Code baixado!');
+    });
+  }
+  
+  // Carregar ao iniciar
+  carregarEventos();
+</script>

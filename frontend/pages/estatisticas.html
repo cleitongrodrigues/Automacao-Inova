@@ -1,0 +1,443 @@
+<!-- Estatísticas e Relatórios -->
+
+<!-- Cabeçalho -->
+<div style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="margin-bottom: 0.5rem;">📈 Estatísticas</h1>
+      <p style="color: var(--cor-texto-secundario); margin: 0;">
+        Relatórios e análises de presença
+      </p>
+    </div>
+    <div>
+      <button onclick="window.print()" class="btn btn-outline no-print">
+        🖨️ Imprimir Relatório
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Filtro de Período -->
+<div class="card" style="margin-bottom: 2rem;">
+  <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 200px;">
+      <label class="form-label">Data Início</label>
+      <input type="date" id="data-inicio" class="form-control" onchange="atualizarEstatisticas()">
+    </div>
+    <div style="flex: 1; min-width: 200px;">
+      <label class="form-label">Data Fim</label>
+      <input type="date" id="data-fim" class="form-control" onchange="atualizarEstatisticas()">
+    </div>
+    <div>
+      <div class="btn-group">
+        <button onclick="aplicarFiltroRapido('mes')" class="btn btn-sm btn-outline">
+          Este Mês
+        </button>
+        <button onclick="aplicarFiltroRapido('trimestre')" class="btn btn-sm btn-outline">
+          Trimestre
+        </button>
+        <button onclick="aplicarFiltroRapido('ano')" class="btn btn-sm btn-outline">
+          Este Ano
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cards de Estatísticas Gerais -->
+<div class="row" style="margin-bottom: 2rem;">
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-primaria); font-size: 2.5rem; margin: 0;" id="stat-total-eventos">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total de Eventos</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-sucesso); font-size: 2.5rem; margin: 0;" id="stat-total-presencas">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total de Presenças</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-secundaria); font-size: 2.5rem; margin: 0;" id="stat-media-presenca">0%</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Média de Presença</p>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="card" style="text-align: center;">
+      <h3 style="color: var(--cor-info); font-size: 2.5rem; margin: 0;" id="stat-total-alunos">0</h3>
+      <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total de Alunos</p>
+    </div>
+  </div>
+</div>
+
+<!-- Gráficos -->
+<div class="row" style="margin-bottom: 2rem;">
+  
+  <!-- Gráfico de Pizza -->
+  <div class="col-6">
+    <div class="card">
+      <h3 style="margin-bottom: 1.5rem;">📊 Distribuição de Presença</h3>
+      <div style="max-width: 300px; margin: 0 auto;">
+        <canvas id="grafico-pizza"></canvas>
+      </div>
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <div style="display: inline-flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+          <div>
+            <span style="display: inline-block; width: 20px; height: 20px; background: var(--cor-sucesso); border-radius: 3px; vertical-align: middle;"></span>
+            <span style="margin-left: 0.5rem; font-weight: bold;" id="legenda-presentes">0</span>
+            <span style="color: var(--cor-texto-secundario);"> Presentes</span>
+          </div>
+          <div>
+            <span style="display: inline-block; width: 20px; height: 20px; background: var(--cor-erro); border-radius: 3px; vertical-align: middle;"></span>
+            <span style="margin-left: 0.5rem; font-weight: bold;" id="legenda-ausentes">0</span>
+            <span style="color: var(--cor-texto-secundario);"> Ausentes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Gráfico de Linha -->
+  <div class="col-6">
+    <div class="card">
+      <h3 style="margin-bottom: 1.5rem;">📈 Evolução de Presença</h3>
+      <canvas id="grafico-linha"></canvas>
+    </div>
+  </div>
+  
+</div>
+
+<!-- Tabela de Eventos Detalhada -->
+<div class="card">
+  <h3 style="margin-bottom: 1.5rem;">📋 Presença por Evento</h3>
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Evento</th>
+          <th>Presentes</th>
+          <th>Ausentes</th>
+          <th>Total</th>
+          <th>% Presença</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-eventos-estatisticas">
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 2rem;">
+            <div class="loading"></div>
+            <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
+              Carregando estatísticas...
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Ranking de Alunos -->
+<div class="row" style="margin-top: 2rem;">
+  <div class="col-6">
+    <div class="card">
+      <h3 style="margin-bottom: 1.5rem;">🏆 Alunos Mais Presentes</h3>
+      <div id="ranking-presentes">
+        <p style="text-align: center; color: var(--cor-texto-secundario);">Carregando...</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-6">
+    <div class="card">
+      <h3 style="margin-bottom: 1.5rem;">⚠️ Alunos com Mais Faltas</h3>
+      <div id="ranking-ausentes">
+        <p style="text-align: center; color: var(--cor-texto-secundario);">Carregando...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+  // Proteger rota
+  if (!protegerRota()) return;
+  
+  let graficoPizza = null;
+  let graficoLinha = null;
+  
+  /**
+   * Aplicar filtro rápido
+   */
+  function aplicarFiltroRapido(periodo) {
+    const hoje = new Date();
+    const dataFim = hoje.toISOString().split('T')[0];
+    let dataInicio;
+    
+    switch (periodo) {
+      case 'mes':
+        dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+        break;
+      case 'trimestre':
+        dataInicio = new Date(hoje.getFullYear(), hoje.getMonth() - 3, 1).toISOString().split('T')[0];
+        break;
+      case 'ano':
+        dataInicio = new Date(hoje.getFullYear(), 0, 1).toISOString().split('T')[0];
+        break;
+    }
+    
+    document.getElementById('data-inicio').value = dataInicio;
+    document.getElementById('data-fim').value = dataFim;
+    
+    atualizarEstatisticas();
+  }
+  
+  /**
+   * Atualizar estatísticas
+   */
+  async function atualizarEstatisticas() {
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+    
+    // ========================================
+    // 🧪 MODO TESTE - Dados mockados
+    // ========================================
+    const dadosFake = {
+      totalEventos: 8,
+      totalPresencas: 156,
+      mediaPresenca: 78,
+      totalAlunos: 25,
+      presentes: 156,
+      ausentes: 44,
+      eventosPorData: [
+        { data: '2026-03-07', nome: 'Encontro de Sábado', presentes: 18, ausentes: 7, total: 25 },
+        { data: '2026-03-14', nome: 'Encontro de Sábado', presentes: 20, ausentes: 5, total: 25 },
+        { data: '2026-03-21', nome: 'Encontro de Sábado', presentes: 19, ausentes: 6, total: 25 },
+        { data: '2026-03-28', nome: 'Encontro de Sábado', presentes: 21, ausentes: 4, total: 25 },
+        { data: '2026-04-04', nome: 'Encontro de Sábado', presentes: 17, ausentes: 8, total: 25 },
+        { data: '2026-04-11', nome: 'Encontro de Sábado', presentes: 22, ausentes: 3, total: 25 },
+        { data: '2026-04-18', nome: 'Encontro de Sábado', presentes: 20, ausentes: 5, total: 25 },
+        { data: '2026-04-25', nome: 'Encontro de Sábado', presentes: 19, ausentes: 6, total: 25 }
+      ],
+      rankingPresentes: [
+        { nome: 'João Silva', presencas: 8, percentual: 100 },
+        { nome: 'Maria Santos', presencas: 8, percentual: 100 },
+        { nome: 'Ana Costa', presencas: 7, percentual: 87.5 },
+        { nome: 'Pedro Oliveira', presencas: 7, percentual: 87.5 },
+        { nome: 'Julia Ferreira', presencas: 6, percentual: 75 }
+      ],
+      rankingAusentes: [
+        { nome: 'Carlos Lima', faltas: 5, percentual: 62.5 },
+        { nome: 'Lucas Martins', faltas: 4, percentual: 50 },
+        { nome: 'Beatriz Alves', faltas: 3, percentual: 37.5 },
+        { nome: 'Rafael Costa', faltas: 3, percentual: 37.5 },
+        { nome: 'Fernanda Dias', faltas: 2, percentual: 25 }
+      ]
+    };
+    
+    renderizarEstatisticas(dadosFake);
+    
+    return; // Remover quando ativar API real
+    
+    // ========================================
+    // 🔒 API REAL
+    // ========================================
+    /*
+    const resultado = await API.obterEstatisticas(dataInicio, dataFim);
+    
+    if (resultado.success) {
+      renderizarEstatisticas(resultado.dados);
+    }
+    */
+  }
+  
+  /**
+   * Renderizar todas as estatísticas
+   */
+  function renderizarEstatisticas(dados) {
+    // Cards
+    document.getElementById('stat-total-eventos').textContent = dados.totalEventos;
+    document.getElementById('stat-total-presencas').textContent = dados.totalPresencas;
+    document.getElementById('stat-media-presenca').textContent = dados.mediaPresenca + '%';
+    document.getElementById('stat-total-alunos').textContent = dados.totalAlunos;
+    
+    // Gráfico de Pizza
+    renderizarGraficoPizza(dados.presentes, dados.ausentes);
+    
+    // Gráfico de Linha
+    renderizarGraficoLinha(dados.eventosPorData);
+    
+    // Tabela de Eventos
+    renderizarTabelaEventos(dados.eventosPorData);
+    
+    // Rankings
+    renderizarRankings(dados.rankingPresentes, dados.rankingAusentes);
+  }
+  
+  /**
+   * Renderizar gráfico de pizza
+   */
+  function renderizarGraficoPizza(presentes, ausentes) {
+    const ctx = document.getElementById('grafico-pizza').getContext('2d');
+    
+    // Destruir gráfico anterior
+    if (graficoPizza) {
+      graficoPizza.destroy();
+    }
+    
+    // Obter cores do CSS
+    const corSucesso = getComputedStyle(document.documentElement).getPropertyValue('--cor-sucesso').trim();
+    const corErro = getComputedStyle(document.documentElement).getPropertyValue('--cor-erro').trim();
+    
+    graficoPizza = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Presentes', 'Ausentes'],
+        datasets: [{
+          data: [presentes, ausentes],
+          backgroundColor: [corSucesso, corErro],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+    
+    // Atualizar legendas
+    document.getElementById('legenda-presentes').textContent = presentes;
+    document.getElementById('legenda-ausentes').textContent = ausentes;
+  }
+  
+  /**
+   * Renderizar gráfico de linha
+   */
+  function renderizarGraficoLinha(eventos) {
+    const ctx = document.getElementById('grafico-linha').getContext('2d');
+    
+    // Destruir gráfico anterior
+    if (graficoLinha) {
+      graficoLinha.destroy();
+    }
+    
+    const labels = eventos.map(e => formatarData(new Date(e.data + 'T00:00:00')).split('/').slice(0, 2).join('/'));
+    const dadosPresentes = eventos.map(e => e.presentes);
+    const dadosAusentes = eventos.map(e => e.ausentes);
+    
+    const corSucesso = getComputedStyle(document.documentElement).getPropertyValue('--cor-sucesso').trim();
+    const corErro = getComputedStyle(document.documentElement).getPropertyValue('--cor-erro').trim();
+    
+    graficoLinha = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Presentes',
+            data: dadosPresentes,
+            borderColor: corSucesso,
+            backgroundColor: corSucesso + '20',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'Ausentes',
+            data: dadosAusentes,
+            borderColor: corErro,
+            backgroundColor: corErro + '20',
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+  
+  /**
+   * Renderizar tabela de eventos
+   */
+  function renderizarTabelaEventos(eventos) {
+    const tbody = document.getElementById('tbody-eventos-estatisticas');
+    
+    tbody.innerHTML = eventos.map(evento => {
+      const percentual = ((evento.presentes / evento.total) * 100).toFixed(1);
+      const corBarra = percentual >= 75 ? 'var(--cor-sucesso)' : percentual >= 50 ? 'var(--cor-aviso)' : 'var(--cor-erro)';
+      
+      return `
+        <tr>
+          <td><strong>${formatarData(new Date(evento.data + 'T00:00:00'))}</strong></td>
+          <td>${evento.nome}</td>
+          <td><span style="color: var(--cor-sucesso); font-weight: bold;">${evento.presentes}</span></td>
+          <td><span style="color: var(--cor-erro); font-weight: bold;">${evento.ausentes}</span></td>
+          <td>${evento.total}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <div style="flex: 1; height: 8px; background: var(--cor-fundo-secundario); border-radius: 4px; overflow: hidden;">
+                <div style="width: ${percentual}%; height: 100%; background: ${corBarra};"></div>
+              </div>
+              <strong>${percentual}%</strong>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  
+  /**
+   * Renderizar rankings
+   */
+  function renderizarRankings(rankingPresentes, rankingAusentes) {
+    const divPresentes = document.getElementById('ranking-presentes');
+    const divAusentes = document.getElementById('ranking-ausentes');
+    
+    divPresentes.innerHTML = rankingPresentes.map((aluno, index) => `
+      <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-bottom: 1px solid var(--cor-borda);">
+        <span style="font-size: 1.5rem;">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1) + 'º'}</span>
+        <div style="flex: 1;">
+          <strong>${aluno.nome}</strong>
+          <div style="font-size: 0.875rem; color: var(--cor-texto-secundario);">
+            ${aluno.presencas} presenças (${aluno.percentual}%)
+          </div>
+        </div>
+        <span class="badge badge-success">${aluno.presencas}</span>
+      </div>
+    `).join('');
+    
+    divAusentes.innerHTML = rankingAusentes.map((aluno, index) => `
+      <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-bottom: 1px solid var(--cor-borda);">
+        <span style="font-size: 1.5rem;">${index + 1}º</span>
+        <div style="flex: 1;">
+          <strong>${aluno.nome}</strong>
+          <div style="font-size: 0.875rem; color: var(--cor-texto-secundario);">
+            ${aluno.faltas} faltas (${aluno.percentual}%)
+          </div>
+        </div>
+        <span class="badge badge-danger">${aluno.faltas}</span>
+      </div>
+    `).join('');
+  }
+  
+  // Inicializar com filtro do mês atual
+  aplicarFiltroRapido('mes');
+</script>
