@@ -14,16 +14,11 @@
 async function login(email, senha) {
   try {
     mostrarLoading();
-    
-    const response = await fetch(`${CONFIG.API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha })
-    });
-    
-    const data = await response.json();
-    
-    if (response.ok && data.success) {
+
+    const data = await API.login(email, senha);
+    const ok = !!(data && (data.success || data.sucesso));
+
+    if (ok) {
       // Salvar token e dados do usuário
       salvarStorage(CONFIG.STORAGE_KEYS.token, data.token);
       salvarStorage(CONFIG.STORAGE_KEYS.user, data.user);
@@ -32,7 +27,7 @@ async function login(email, senha) {
       
       return { success: true, user: data.user };
     } else {
-      throw new Error(data.message || 'Credenciais inválidas');
+      throw new Error(data?.mensagem || data?.message || 'Credenciais inválidas');
     }
   } catch (error) {
     console.error('Erro no login:', error);

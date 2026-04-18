@@ -74,7 +74,7 @@
 
 <script>
   // Proteger rota
-  if (!protegerRota()) return;
+  protegerRota();
   
   // Mostrar data de hoje
   document.getElementById('data-hoje').textContent = formatarData(new Date());

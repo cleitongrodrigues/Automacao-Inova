@@ -6,6 +6,7 @@
  */
 
 let pollingIntervals = {};
+let pollingPausado = false;
 
 /**
  * Inicia polling
@@ -62,23 +63,13 @@ function pollingEstaAtivo(nome) {
  */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    // Usuário saiu da aba - pausar todos os pollings
-    Object.keys(pollingIntervals).forEach(nome => {
-      const intervalo = pollingIntervals[nome];
-      if (intervalo) {
-        clearInterval(intervalo);
-        pollingIntervals[nome] = { paused: true, original: intervalo };
-      }
-    });
-    console.log('⏸️ Pollings pausados (aba inativa)');
+    if (!pollingPausado) {
+      pararTodosPollings();
+      pollingPausado = true;
+      console.log('⏸️ Pollings pausados (aba inativa)');
+    }
   } else {
-    // Usuário voltou para a aba - retomar pollings
-    Object.keys(pollingIntervals).forEach(nome => {
-      if (pollingIntervals[nome].paused) {
-        // Nota: Para retomar, a página precisará chamar iniciarPolling() novamente
-        console.log(`▶️ Polling "${nome}" precisa ser reiniciado`);
-      }
-    });
+    pollingPausado = false;
   }
 });
 

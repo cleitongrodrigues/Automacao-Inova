@@ -7,6 +7,70 @@
  * ⚠️ IMPORTANTE: Backend valida tudo! Frontend só faz validações de UX.
  */
 
+async function requisicaoJSON(url, options = {}, requerAuth = false) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+
+  try {
+    const resposta = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+
+    if (requerAuth && resposta.status === 401) {
+      verificarTokenExpirado(resposta);
+    }
+
+    let dados = null;
+    try {
+      dados = await resposta.json();
+    } catch (erroJson) {
+      dados = null;
+    }
+
+    if (!resposta.ok) {
+      return {
+        success: false,
+        sucesso: false,
+        mensagem: dados?.mensagem || dados?.message || `Erro HTTP ${resposta.status}`,
+        status: resposta.status,
+        dados
+      };
+    }
+
+    if (dados && typeof dados === 'object') {
+      if (!('success' in dados) && !('sucesso' in dados)) {
+        dados.success = true;
+      }
+      return dados;
+    }
+
+    return {
+      success: true,
+      sucesso: true,
+      dados: dados
+    };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return {
+        success: false,
+        sucesso: false,
+        mensagem: 'Tempo limite excedido na requisicao. Tente novamente.',
+        timeout: true
+      };
+    }
+
+    return {
+      success: false,
+      sucesso: false,
+      mensagem: 'Falha de conexao com a API. Verifique se o backend esta ativo.',
+      erroTecnico: error.message
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 const API = {
   
   /**
@@ -19,23 +83,21 @@ const API = {
    * Login de administrador
    */
   async login(email, senha) {
-    const response = await fetch(`${CONFIG.API_URL}/login`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, senha })
     });
-    return response.json();
   },
   
   /**
    * Logout
    */
   async logout() {
-    const response = await fetch(`${CONFIG.API_URL}/logout`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/logout`, {
       method: 'POST',
       headers: obterHeadersAutenticados()
-    });
-    return response.json();
+    }, true);
   },
   
   
@@ -49,53 +111,41 @@ const API = {
    * Registra presença de aluno (público)
    */
   async registrarPresenca(dados) {
-    const response = await fetch(`${CONFIG.API_URL}/registrar-presenca`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/registrar-presenca`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados)
     });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
   },
   
   /**
    * Lista presença do dia (admin)
    */
   async listarPresencas() {
-    const response = await fetch(`${CONFIG.API_URL}/lista-presenca`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/lista-presenca`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Aprovar presença manualmente (admin)
    */
   async aprovarPresenca(id) {
-    const response = await fetch(`${CONFIG.API_URL}/presencas/${id}/aprovar`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/presencas/${id}/aprovar`, {
       method: 'POST',
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Rejeitar presença (admin)
    */
   async rejeitarPresenca(id, motivo) {
-    const response = await fetch(`${CONFIG.API_URL}/presencas/${id}/rejeitar`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/presencas/${id}/rejeitar`, {
       method: 'POST',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify({ motivo })
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   
@@ -109,65 +159,50 @@ const API = {
    * Listar todos os alunos
    */
   async listarAlunos() {
-    const response = await fetch(`${CONFIG.API_URL}/alunos`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/alunos`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Buscar aluno por ID
    */
   async buscarAluno(id) {
-    const response = await fetch(`${CONFIG.API_URL}/alunos/${id}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/alunos/${id}`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Criar novo aluno
    */
   async criarAluno(dados) {
-    const response = await fetch(`${CONFIG.API_URL}/alunos`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/alunos`, {
       method: 'POST',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify(dados)
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Atualizar aluno existente
    */
   async atualizarAluno(id, dados) {
-    const response = await fetch(`${CONFIG.API_URL}/alunos/${id}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/alunos/${id}`, {
       method: 'PUT',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify(dados)
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Remover aluno (soft delete)
    */
   async removerAluno(id) {
-    const response = await fetch(`${CONFIG.API_URL}/alunos/${id}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/alunos/${id}`, {
       method: 'DELETE',
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   
@@ -181,8 +216,7 @@ const API = {
    * Obter evento atual (do sábado)
    */
   async eventoAtual() {
-    const response = await fetch(`${CONFIG.API_URL}/evento-atual`);
-    return response.json();
+    return requisicaoJSON(`${CONFIG.API_URL}/evento-atual`);
   },
 
   /**
@@ -190,68 +224,54 @@ const API = {
    */
   async validarEventoPorToken(token) {
     const params = new URLSearchParams({ token });
-    const response = await fetch(`${CONFIG.API_URL}/evento-atual?${params}`);
-    return response.json();
+    return requisicaoJSON(`${CONFIG.API_URL}/evento-atual?${params}`);
   },
 
   /**
    * Buscar configuração de um evento
    */
   async obterConfigEvento(id) {
-    const response = await fetch(`${CONFIG.API_URL}/eventos/${id}/config`);
-    return response.json();
+    return requisicaoJSON(`${CONFIG.API_URL}/eventos/${id}/config`);
   },
   
   /**
    * Listar todos os eventos
    */
   async listarEventos() {
-    const response = await fetch(`${CONFIG.API_URL}/eventos`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/eventos`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Criar novo evento
    */
   async criarEvento(dados) {
-    const response = await fetch(`${CONFIG.API_URL}/eventos`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/eventos`, {
       method: 'POST',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify(dados)
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Atualizar evento
    */
   async atualizarEvento(id, dados) {
-    const response = await fetch(`${CONFIG.API_URL}/eventos/${id}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/eventos/${id}`, {
       method: 'PUT',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify(dados)
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
    * Gerar QR Code para evento
    */
   async gerarQRCode() {
-    const response = await fetch(`${CONFIG.API_URL}/qrcode/gerar`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/qrcode/gerar`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   
@@ -266,12 +286,9 @@ const API = {
    */
   async obterEstatisticas(filtros = {}) {
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${CONFIG.API_URL}/estatisticas?${params}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/estatisticas?${params}`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   /**
@@ -279,12 +296,9 @@ const API = {
    */
   async obterHistorico(filtros = {}) {
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${CONFIG.API_URL}/relatorios?${params}`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/relatorios?${params}`, {
       headers: obterHeadersAutenticados()
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   },
   
   
@@ -298,14 +312,11 @@ const API = {
    * Upload de foto (base64)
    */
   async uploadFoto(fotoBase64, tipo = 'aluno') {
-    const response = await fetch(`${CONFIG.API_URL}/upload/foto`, {
+    return requisicaoJSON(`${CONFIG.API_URL}/upload/foto`, {
       method: 'POST',
       headers: obterHeadersAutenticados(),
       body: JSON.stringify({ foto: fotoBase64, tipo })
-    });
-    
-    if (response.status === 401) verificarTokenExpirado(response);
-    return response.json();
+    }, true);
   }
   
 };

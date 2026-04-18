@@ -1,5 +1,76 @@
 <!-- Gestão de Alunos - CRUD Completo -->
 
+<style>
+  #tabela-alunos {
+    min-width: 1100px;
+  }
+
+  #tabela-alunos .col-foto {
+    width: 72px;
+  }
+
+  #tabela-alunos .col-nome {
+    min-width: 260px;
+  }
+
+  #tabela-alunos .col-cpf,
+  #tabela-alunos .col-matricula,
+  #tabela-alunos .col-telefone {
+    white-space: nowrap;
+  }
+
+  #tabela-alunos .col-email {
+    min-width: 220px;
+  }
+
+  #tabela-alunos .col-empresa {
+    min-width: 170px;
+  }
+
+  #tabela-alunos .col-acoes {
+    width: 120px;
+  }
+
+  .aluno-foto-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--cor-fundo-secundario);
+    border: 1px solid var(--cor-borda);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--cor-texto-secundario);
+  }
+
+  .aluno-foto-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .aluno-nome {
+    display: inline-block;
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+
+  .alunos-acoes {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .alunos-acoes .btn {
+    min-width: 42px;
+    padding: 0.45rem 0.65rem;
+  }
+</style>
+
 <!-- Cabeçalho -->
 <div style="margin-bottom: 2rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -19,19 +90,19 @@
 
 <!-- Estatísticas -->
 <div class="row" style="margin-bottom: 2rem;">
-  <div class="col-4">
+  <div class="col-3">
     <div class="card" style="text-align: center;">
       <h3 style="color: var(--cor-primaria); font-size: 2rem; margin: 0;" id="total-cadastrados">0</h3>
       <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Total Cadastrados</p>
     </div>
   </div>
-  <div class="col-4">
+  <div class="col-3">
     <div class="card" style="text-align: center;">
       <h3 style="color: var(--cor-sucesso); font-size: 2rem; margin: 0;" id="total-com-foto">0</h3>
       <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Com Foto</p>
     </div>
   </div>
-  <div class="col-4">
+  <div class="col-3">
     <div class="card" style="text-align: center;">
       <h3 style="color: var(--cor-aviso); font-size: 2rem; margin: 0;" id="total-sem-foto">0</h3>
       <p style="color: var(--cor-texto-secundario); margin: 0.5rem 0 0 0;">Sem Foto</p>
@@ -58,12 +129,12 @@
         <tr>
           <th>Foto</th>
           <th>Nome</th>
-          <th>CPF</th>
-          <th>Matrícula</th>
-          <th>Email</th>
-          <th>Empresa/Instituição</th>
-          <th>Telefone</th>
-          <th>Ações</th>
+          <th class="col-cpf">CPF</th>
+          <th class="col-matricula">Matrícula</th>
+          <th class="col-email">Email</th>
+          <th class="col-empresa">Empresa/Instituição</th>
+          <th class="col-telefone">Telefone</th>
+          <th class="col-acoes">Ações</th>
         </tr>
       </thead>
       <tbody id="tbody-alunos">
@@ -254,43 +325,76 @@
 
 <script>
   // Proteger rota
-  if (!protegerRota()) return;
+  var paginaAutorizada = protegerRota();
   
-  let alunoParaExcluir = null;
-  let alunosFake = [
-    { id: 1, nome: 'João Silva', cpf: '123.456.789-09', matricula: 'A001', email: 'joao@email.com', empresa: 'FATEC', telefone: '(11) 98765-4321', foto: true },
-    { id: 2, nome: 'Maria Santos', cpf: '987.654.321-00', matricula: 'A002', email: 'maria@email.com', empresa: 'EVERTEC', telefone: '(11) 98765-4322', foto: true },
-    { id: 3, nome: 'Pedro Oliveira', cpf: '111.444.777-35', matricula: 'A003', email: 'pedro@email.com', empresa: 'MENTTO', telefone: '', foto: false },
-    { id: 4, nome: 'Ana Costa', cpf: '529.982.247-25', matricula: 'A004', email: 'ana@email.com', empresa: 'FATEC', telefone: '(11) 98765-4324', foto: true },
-  ];
+  var alunoParaExcluir = null;
+  var alunosCache = [];
+
+  function escaparAspasSimples(texto = '') {
+    return String(texto).replace(/'/g, "\\'");
+  }
+
+  function obterIniciais(nome = '') {
+    const partes = String(nome).trim().split(/\s+/).filter(Boolean);
+    if (partes.length === 0) return '👤';
+    return (partes[0][0] + (partes[1] ? partes[1][0] : '')).toUpperCase();
+  }
+
+  function normalizarAlunos(lista = []) {
+    return lista.map((aluno) => {
+      const cpfLimpo = limparCPF(String(aluno.cpf || ''));
+      return {
+        id: Number(aluno.id),
+        nome: aluno.nome || '',
+        cpf: cpfLimpo,
+        cpfExibicao: cpfLimpo ? formatarCPF(cpfLimpo) : '-',
+        matricula: aluno.matricula || '',
+        email: aluno.email || '',
+        empresa: aluno.empresa || '',
+        telefone: aluno.telefone || '',
+        foto: !!aluno.foto_cadastro,
+        foto_cadastro: aluno.foto_cadastro || null,
+        fotoUrl: aluno.foto_cadastro || null
+      };
+    });
+  }
+
+  function renderizarEstadoTabela(mensagem, mostrarBotao = true) {
+    const tbody = document.getElementById('tbody-alunos');
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 2rem;">
+          <p style="color: var(--cor-texto-secundario); font-size: 1rem; margin-bottom: ${mostrarBotao ? '1rem' : '0'};">
+            ${mensagem}
+          </p>
+          ${mostrarBotao ? '<button onclick="carregarAlunos()" class="btn btn-secondary">Tentar novamente</button>' : ''}
+        </td>
+      </tr>
+    `;
+  }
   
   /**
    * Carrega lista de alunos
    */
   async function carregarAlunos() {
     try {
-      // ========================================
-      // 🧪 MODO TESTE - Dados mockados
-      // ========================================
-      renderizarTabelaAlunos(alunosFake);
-      atualizarEstatisticasAlunos(alunosFake);
-      return; // Remover quando ativar API real
-      
-      // ========================================
-      // 🔒 API REAL (ativar quando backend estiver pronto)
-      // ========================================
-      /*
       const resultado = await API.listarAlunos();
+      const ok = !!(resultado && (resultado.success || resultado.sucesso));
       
-      if (resultado.success) {
-        renderizarTabelaAlunos(resultado.alunos);
-        atualizarEstatisticasAlunos(resultado.alunos);
+      if (ok) {
+        const lista = Array.isArray(resultado.dados) ? resultado.dados : (resultado.alunos || []);
+        alunosCache = normalizarAlunos(lista);
+        renderizarTabelaAlunos(alunosCache);
+        atualizarEstatisticasAlunos(alunosCache);
       } else {
-        mostrarMensagem('error', resultado.message || 'Erro ao carregar alunos');
+        renderizarEstadoTabela('Nao foi possivel carregar os alunos agora.');
+        mostrarMensagem('error', resultado?.mensagem || resultado?.message || 'Erro ao carregar alunos');
       }
-      */
     } catch (error) {
       console.error('Erro:', error);
+      renderizarEstadoTabela('Falha de conexao com a API de alunos.');
       mostrarMensagem('error', 'Erro ao carregar alunos');
     }
   }
@@ -319,24 +423,28 @@
     
     tbody.innerHTML = alunos.map(aluno => `
       <tr data-aluno-id="${aluno.id}">
-        <td>
-          <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--cor-fundo-secundario); display: flex; align-items: center; justify-content: center;">
-            ${aluno.foto ? '📸' : '👤'}
+        <td class="col-foto">
+          <div class="aluno-foto-wrap">
+            ${aluno.fotoUrl
+              ? `<img src="${aluno.fotoUrl}" alt="Foto de ${aluno.nome}">`
+              : `<span>${obterIniciais(aluno.nome)}</span>`}
           </div>
         </td>
-        <td><strong>${aluno.nome}</strong></td>
-        <td>${aluno.cpf}</td>
-        <td>${aluno.matricula}</td>
-        <td>${aluno.email}</td>
-        <td>${aluno.empresa || '-'}</td>
-        <td>${aluno.telefone || '-'}</td>
-        <td>
-          <button onclick="editarAluno(${aluno.id})" class="btn btn-sm btn-secondary" title="Editar">
-            ✏️
-          </button>
-          <button onclick="abrirModalExcluir(${aluno.id}, '${aluno.nome}')" class="btn btn-sm btn-danger" title="Excluir">
-            🗑️
-          </button>
+        <td class="col-nome"><strong class="aluno-nome" title="${aluno.nome}">${aluno.nome}</strong></td>
+        <td class="col-cpf">${aluno.cpfExibicao}</td>
+        <td class="col-matricula">${aluno.matricula}</td>
+        <td class="col-email">${aluno.email}</td>
+        <td class="col-empresa">${aluno.empresa || '-'}</td>
+        <td class="col-telefone">${aluno.telefone || '-'}</td>
+        <td class="col-acoes">
+          <div class="alunos-acoes">
+            <button onclick="editarAluno(${aluno.id})" class="btn btn-sm btn-secondary" title="Editar">
+              ✏️
+            </button>
+            <button onclick="abrirModalExcluir(${aluno.id}, '${escaparAspasSimples(aluno.nome)}')" class="btn btn-sm btn-danger" title="Excluir">
+              🗑️
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
@@ -459,79 +567,56 @@
     }
     
     if (temErro) return;
-    
-    // ========================================
-    // 🧪 MODO TESTE - Salvar localmente
-    // ========================================
-    mostrarLoading();
-    
-    setTimeout(() => {
-      if (id) {
-        // Editar
-        const index = alunosFake.findIndex(a => a.id == id);
-        if (index !== -1) {
-          alunosFake[index] = { 
-            ...alunosFake[index], 
-            nome, cpf, matricula, email, empresa, telefone,
-            foto: fotoInput.files[0] ? true : alunosFake[index].foto
-          };
-        }
-        mostrarMensagem('success', 'Aluno atualizado com sucesso!');
-      } else {
-        // Criar
-        const novoId = Math.max(...alunosFake.map(a => a.id)) + 1;
-        alunosFake.push({ 
-          id: novoId, 
-          nome, cpf, matricula, email, empresa, telefone, 
-          foto: true 
-        });
-        mostrarMensagem('success', 'Aluno cadastrado com sucesso!');
+
+    try {
+      mostrarLoading();
+
+      let fotoBase64 = null;
+      if (fotoInput.files[0]) {
+        fotoBase64 = await fileToBase64(fotoInput.files[0]);
       }
-      
+
+      const payload = {
+        nome,
+        cpf: limparCPF(cpf),
+        matricula: matricula || null,
+        email,
+        telefone: telefone || null,
+        empresa: empresa || null,
+        foto_cadastro: fotoBase64
+      };
+
+      const resultado = id
+        ? await API.atualizarAluno(id, payload)
+        : await API.criarAluno(payload);
+      const ok = !!(resultado && (resultado.success || resultado.sucesso));
+
+      if (ok) {
+        mostrarMensagem('success', id ? 'Aluno atualizado com sucesso!' : 'Aluno cadastrado com sucesso!');
+        fecharModalAluno();
+        await carregarAlunos();
+      } else {
+        mostrarMensagem('error', resultado?.mensagem || resultado?.message || 'Erro ao salvar aluno');
+      }
+    } catch (error) {
+      console.error('Erro ao salvar aluno:', error);
+      mostrarMensagem('error', 'Erro ao salvar aluno');
+    } finally {
       esconderLoading();
-      fecharModalAluno();
-      carregarAlunos();
-    }, 500);
-    
-    return; // Remover quando ativar API real
-    
-    // ========================================
-    // 🔒 API REAL (ativar quando backend estiver pronto)
-    // ========================================
-    /*
-    const formData = new FormData();
-    formData.append('nome', nome);
-    formData.append('cpf', cpf);
-    formData.append('matricula', matricula);
-    formData.append('email', email);
-    formData.append('telefone', telefone);
-    
-    if (fotoInput.files[0]) {
-      formData.append('foto', fotoInput.files[0]);
     }
-    
-    const resultado = id 
-      ? await API.atualizarAluno(id, formData)
-      : await API.criarAluno(formData);
-    
-    if (resultado.success) {
-      fecharModalAluno();
-      carregarAlunos();
-    }
-    */
   }
   
   /**
    * Editar aluno
    */
   function editarAluno(id) {
-    const aluno = alunosFake.find(a => a.id === id);
+    const aluno = alunosCache.find(a => a.id === id);
     if (!aluno) return;
     
     document.getElementById('modal-titulo').textContent = 'Editar Aluno';
     document.getElementById('aluno-id').value = aluno.id;
     document.getElementById('nome').value = aluno.nome;
-    document.getElementById('cpf').value = aluno.cpf;
+    document.getElementById('cpf').value = formatarCPF(aluno.cpf);
     document.getElementById('matricula').value = aluno.matricula;
     document.getElementById('email-aluno').value = aluno.email;
     document.getElementById('empresa').value = aluno.empresa || '';
@@ -566,36 +651,29 @@
    */
   async function confirmarExclusao() {
     if (!alunoParaExcluir) return;
-    
-    // ========================================
-    // 🧪 MODO TESTE
-    // ========================================
-    mostrarLoading();
-    
-    setTimeout(() => {
-      alunosFake = alunosFake.filter(a => a.id !== alunoParaExcluir);
-      
+
+    try {
+      mostrarLoading();
+      const resultado = await API.removerAluno(alunoParaExcluir);
+      const ok = !!(resultado && (resultado.success || resultado.sucesso));
+
+      if (ok) {
+        fecharModalExcluir();
+        await carregarAlunos();
+        mostrarMensagem('success', 'Aluno excluido com sucesso!');
+      } else {
+        mostrarMensagem('error', resultado?.mensagem || resultado?.message || 'Erro ao excluir aluno');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error);
+      mostrarMensagem('error', 'Erro ao excluir aluno');
+    } finally {
       esconderLoading();
-      fecharModalExcluir();
-      carregarAlunos();
-      mostrarMensagem('success', 'Aluno excluído com sucesso!');
-    }, 500);
-    
-    return; // Remover quando ativar API real
-    
-    // ========================================
-    // 🔒 API REAL
-    // ========================================
-    /*
-    const resultado = await API.excluirAluno(alunoParaExcluir);
-    
-    if (resultado.success) {
-      fecharModalExcluir();
-      carregarAlunos();
     }
-    */
   }
   
   // Carregar ao iniciar
-  carregarAlunos();
+  if (paginaAutorizada) {
+    carregarAlunos();
+  }
 </script>
