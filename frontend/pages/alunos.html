@@ -61,13 +61,14 @@
           <th>CPF</th>
           <th>Matrícula</th>
           <th>Email</th>
+          <th>Empresa/Instituição</th>
           <th>Telefone</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody id="tbody-alunos">
         <tr>
-          <td colspan="7" style="text-align: center; padding: 2rem;">
+          <td colspan="8" style="text-align: center; padding: 2rem;">
             <div class="loading"></div>
             <p style="margin-top: 1rem; color: var(--cor-texto-secundario);">
               Carregando alunos...
@@ -183,6 +184,17 @@
           
           <!-- Telefone -->
           <div class="form-group">
+            <label for="empresa" class="form-label">Empresa/Instituição</label>
+            <input 
+              type="text" 
+              id="empresa" 
+              class="form-control" 
+              placeholder="FATEC"
+            >
+          </div>
+
+          <!-- Telefone -->
+          <div class="form-group">
             <label for="telefone" class="form-label">Telefone</label>
             <input 
               type="text" 
@@ -246,10 +258,10 @@
   
   let alunoParaExcluir = null;
   let alunosFake = [
-    { id: 1, nome: 'João Silva', cpf: '123.456.789-01', matricula: 'A001', email: 'joao@email.com', telefone: '(11) 98765-4321', foto: true },
-    { id: 2, nome: 'Maria Santos', cpf: '234.567.890-12', matricula: 'A002', email: 'maria@email.com', telefone: '(11) 98765-4322', foto: true },
-    { id: 3, nome: 'Pedro Oliveira', cpf: '345.678.901-23', matricula: 'A003', email: 'pedro@email.com', telefone: '', foto: false },
-    { id: 4, nome: 'Ana Costa', cpf: '456.789.012-34', matricula: 'A004', email: 'ana@email.com', telefone: '(11) 98765-4324', foto: true },
+    { id: 1, nome: 'João Silva', cpf: '123.456.789-09', matricula: 'A001', email: 'joao@email.com', empresa: 'FATEC', telefone: '(11) 98765-4321', foto: true },
+    { id: 2, nome: 'Maria Santos', cpf: '987.654.321-00', matricula: 'A002', email: 'maria@email.com', empresa: 'EVERTEC', telefone: '(11) 98765-4322', foto: true },
+    { id: 3, nome: 'Pedro Oliveira', cpf: '111.444.777-35', matricula: 'A003', email: 'pedro@email.com', empresa: 'MENTTO', telefone: '', foto: false },
+    { id: 4, nome: 'Ana Costa', cpf: '529.982.247-25', matricula: 'A004', email: 'ana@email.com', empresa: 'FATEC', telefone: '(11) 98765-4324', foto: true },
   ];
   
   /**
@@ -292,7 +304,7 @@
     if (!alunos || alunos.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 2rem;">
+          <td colspan="8" style="text-align: center; padding: 2rem;">
             <p style="color: var(--cor-texto-secundario); font-size: 1.2rem;">
               Nenhum aluno cadastrado ainda.
             </p>
@@ -316,6 +328,7 @@
         <td>${aluno.cpf}</td>
         <td>${aluno.matricula}</td>
         <td>${aluno.email}</td>
+        <td>${aluno.empresa || '-'}</td>
         <td>${aluno.telefone || '-'}</td>
         <td>
           <button onclick="editarAluno(${aluno.id})" class="btn btn-sm btn-secondary" title="Editar">
@@ -413,6 +426,7 @@
     const cpf = document.getElementById('cpf').value.trim();
     const matricula = document.getElementById('matricula').value.trim();
     const email = document.getElementById('email-aluno').value.trim();
+    const empresa = document.getElementById('empresa').value.trim();
     const telefone = document.getElementById('telefone').value.trim();
     const fotoInput = document.getElementById('foto-aluno');
     
@@ -458,7 +472,7 @@
         if (index !== -1) {
           alunosFake[index] = { 
             ...alunosFake[index], 
-            nome, cpf, matricula, email, telefone,
+            nome, cpf, matricula, email, empresa, telefone,
             foto: fotoInput.files[0] ? true : alunosFake[index].foto
           };
         }
@@ -468,7 +482,7 @@
         const novoId = Math.max(...alunosFake.map(a => a.id)) + 1;
         alunosFake.push({ 
           id: novoId, 
-          nome, cpf, matricula, email, telefone, 
+          nome, cpf, matricula, email, empresa, telefone, 
           foto: true 
         });
         mostrarMensagem('success', 'Aluno cadastrado com sucesso!');
@@ -520,6 +534,7 @@
     document.getElementById('cpf').value = aluno.cpf;
     document.getElementById('matricula').value = aluno.matricula;
     document.getElementById('email-aluno').value = aluno.email;
+    document.getElementById('empresa').value = aluno.empresa || '';
     document.getElementById('telefone').value = aluno.telefone || '';
     
     if (aluno.foto) {

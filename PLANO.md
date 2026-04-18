@@ -123,6 +123,7 @@ Automacao-Inova/
 │   └── aprovacoes.ejs             # Aprovação manual de presenças
 │
 └── database/
+   ├── migrations/               # Scripts de migração (SQLite/PostgreSQL)
     └── automacao.db               # SQLite database (gerado auto, apenas dev)
 ```
 
@@ -139,6 +140,7 @@ Automacao-Inova/
 | matricula | VARCHAR(50) UNIQUE | Matrícula/código (opcional) |
 | email | VARCHAR(255) NOT NULL | Email de contato (obrigatório) |
 | telefone | VARCHAR(20) | Telefone (opcional) |
+| empresa | VARCHAR(255) | Empresa/Instituição (opcional) |
 | **foto_cadastro** | **VARCHAR(255)** | **Path da foto para reconhecimento facial** |
 | ativo | BOOLEAN DEFAULT 1 | Se está ativo no programa |
 | created_at | TIMESTAMP | Data de cadastro |
@@ -259,7 +261,7 @@ Automacao-Inova/
 
 #### POST `/api/alunos`
 - Criar novo aluno
-- **Body**: `{ nome, cpf, matricula, email, telefone, foto_cadastro (base64 ou upload) }`
+- **Body**: `{ nome, cpf, matricula, email, telefone, empresa, foto_cadastro (base64 ou upload) }`
 - **Validações**: CPF único, email válido, foto obrigatória
 
 #### PUT `/api/alunos/:id`
@@ -1395,12 +1397,31 @@ O foco está em **resolver o problema real de forma prática**, com dados seguro
 
 **Autor**: GitHub Copilot  
 **Data de Criação**: 17/04/2026  
-**Versão**: 2.3 (Configuração flexível por evento + formulário simplificado CPF/Email)  
-**Última Atualização**: 17/04/2026
+**Versão**: 2.4 (Ajustes de implementação do fluxo QR + migrações iniciais)  
+**Última Atualização**: 18/04/2026
 
 ---
 
 ## � Histórico de Versões
+
+### v2.4 - Ajustes de Implementação (18/04/2026)
+**Objetivos**: Manter o fluxo oficial por QR Code e registrar ajustes técnicos mínimos já aplicados no repositório
+
+**Alterações**:
+- ✅ **Fluxo QR mantido como principal** (planilha manual permanece apenas como referência operacional)
+- ✅ **Frontend**: adicionado `CONFIG.USE_MOCK_DATA` para alternar entre dados simulados e API real
+- ✅ **Frontend**: padronização do campo `requer_reconhecimento_facial` nas páginas de evento/presença
+- ✅ **Frontend**: validação de CPF com dígitos verificadores no client-side (UX)
+- ✅ **Frontend**: inclusão de `empresa` no cadastro/listagem de alunos
+- ✅ **API client**: helpers para `validarEventoPorToken(token)` e `obterConfigEvento(id)`
+- ✅ **Migrações criadas**: `database/migrations/20260418_sqlite_ajustes_presenca.sql` e `database/migrations/20260418_postgresql_ajustes_presenca.sql`
+- ✅ **Banco**: inclusão de `empresa` em `alunos`, reforço de unicidade `UNIQUE (aluno_id, evento_id)` e índices de apoio a relatórios
+
+**Benefícios**:
+- 🚀 **Entrega mais segura**: preserva o escopo do MVP em QR Code sem desviar para processo manual
+- 🔒 **Integridade de dados**: reduz risco de presença duplicada por participante/evento
+- 📊 **Base para relatórios**: melhora suporte a listagens por empresa/instituição
+- 🧩 **Transição suave**: frontend pronto para desligar mock e conectar ao backend real
 
 ### v2.3 - Configuração Flexível por Evento (17/04/2026)
 **Objetivos**: Permitir eventos grandes sem facial + melhorar UX com formulário simplificado

@@ -242,7 +242,7 @@
       data: '2026-04-18', 
       horario_inicio: '08:00', 
       horario_fim: '12:00',
-      requer_facial: true, 
+      requer_reconhecimento_facial: true, 
       ativo: true,
       token: 'ABC123XYZ'
     },
@@ -252,7 +252,7 @@
       data: '2026-04-11', 
       horario_inicio: '08:00', 
       horario_fim: '12:00',
-      requer_facial: false, 
+      requer_reconhecimento_facial: false, 
       ativo: false,
       token: 'DEF456UVW'
     },
@@ -262,7 +262,7 @@
       data: '2026-04-25', 
       horario_inicio: '08:00', 
       horario_fim: '12:00',
-      requer_facial: true, 
+      requer_reconhecimento_facial: true, 
       ativo: false,
       token: 'GHI789RST'
     }
@@ -369,7 +369,7 @@
           </span>
         </td>
         <td>
-          ${evento.requer_facial ? '🔐 Sim' : '- Não'}
+          ${evento.requer_reconhecimento_facial ? '🔐 Sim' : '- Não'}
         </td>
         <td>
           <button onclick="visualizarQRCode(${evento.id})" class="btn btn-sm btn-secondary">
@@ -482,7 +482,7 @@
           eventosFake[index] = { 
             ...eventosFake[index], 
             nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim, 
-            requer_facial: requerFacial, descricao
+            requer_reconhecimento_facial: requerFacial, descricao
           };
         }
         mostrarMensagem('success', 'Evento atualizado!');
@@ -493,7 +493,7 @@
         eventosFake.push({ 
           id: novoId, 
           nome, data, horario_inicio: horarioInicio, horario_fim: horarioFim,
-          requer_facial: requerFacial, descricao,
+          requer_reconhecimento_facial: requerFacial, descricao,
           ativo: false,
           token
         });
@@ -519,7 +519,7 @@
     document.getElementById('data-evento').value = evento.data;
     document.getElementById('horario-inicio').value = evento.horario_inicio;
     document.getElementById('horario-fim').value = evento.horario_fim;
-    document.getElementById('requer-facial').checked = evento.requer_facial;
+    document.getElementById('requer-facial').checked = !!evento.requer_reconhecimento_facial;
     document.getElementById('descricao-evento').value = evento.descricao || '';
     
     document.getElementById('modal-evento').classList.add('active');
@@ -575,15 +575,13 @@
    */
   function copiarLink() {
     const input = document.getElementById('link-presenca');
-    input.select();
-    document.execCommand('copy');
-    mostrarMensagem('success', 'Link copiado!');
+    copiarTexto(input.value);
   }
   
   /**
    * Download QR Code
    */
-  function downloadQRCode(divId, nomearquivo) {
+  function downloadQRCode(divId, nomeArquivo) {
     const canvas = document.querySelector(`#${divId} canvas`);
     if (!canvas) {
       mostrarMensagem('error', 'QR Code não encontrado');

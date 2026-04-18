@@ -184,6 +184,23 @@ const API = {
     const response = await fetch(`${CONFIG.API_URL}/evento-atual`);
     return response.json();
   },
+
+  /**
+   * Validar token recebido no QR Code
+   */
+  async validarEventoPorToken(token) {
+    const params = new URLSearchParams({ token });
+    const response = await fetch(`${CONFIG.API_URL}/evento-atual?${params}`);
+    return response.json();
+  },
+
+  /**
+   * Buscar configuração de um evento
+   */
+  async obterConfigEvento(id) {
+    const response = await fetch(`${CONFIG.API_URL}/eventos/${id}/config`);
+    return response.json();
+  },
   
   /**
    * Listar todos os eventos

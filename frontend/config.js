@@ -7,12 +7,26 @@
 
 const CONFIG = {
   /**
+   * Executa frontend com dados mockados.
+   * Defina false quando o backend real estiver disponível.
+   */
+  USE_MOCK_DATA: true,
+
+  /**
    * URL da API do Backend
    * 
    * Desenvolvimento: http://localhost:5000/api
    * Produção: https://sua-api.herokuapp.com/api (ou outro servidor)
    */
   API_URL: 'http://localhost:5000/api',
+
+  /**
+   * Configurações do fluxo de presença via QR Code
+   */
+  PRESENCA: {
+    route: '/presenca',
+    tokenParam: 'token'
+  },
   
   /**
    * Intervalo de Atualização Automática (Polling)

@@ -12,14 +12,30 @@
  */
 
 /**
- * Valida formato de CPF (11 dígitos)
+ * Valida CPF com dígitos verificadores
  * Aceita: 12345678900 ou 123.456.789-00
- * NÃO valida dígitos verificadores (backend faz isso)
  */
 function validarFormatoCPF(cpf) {
   if (!cpf) return false;
-  cpf = cpf.replace(/\D/g, ''); // Remove não-dígitos
-  return cpf.length === 11;
+  const digitos = cpf.replace(/\D/g, '');
+
+  if (digitos.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(digitos)) return false;
+
+  const calcularDigito = (base, fatorInicial) => {
+    let soma = 0;
+    for (let i = 0; i < base.length; i++) {
+      soma += Number(base[i]) * (fatorInicial - i);
+    }
+    const resto = (soma * 10) % 11;
+    return resto === 10 ? 0 : resto;
+  };
+
+  const baseNove = digitos.slice(0, 9);
+  const digito1 = calcularDigito(baseNove, 10);
+  const digito2 = calcularDigito(baseNove + String(digito1), 11);
+
+  return digitos === `${baseNove}${digito1}${digito2}`;
 }
 
 /**
@@ -151,6 +167,20 @@ function mascaraTelefone(input) {
   }
   
   input.value = valor;
+}
+
+/**
+ * Compatibilidade com chamadas antigas nos templates.
+ */
+function aplicarMascaraCPF(input) {
+  mascaraCPF(input);
+}
+
+/**
+ * Compatibilidade com chamadas antigas nos templates.
+ */
+function aplicarMascaraTelefone(input) {
+  mascaraTelefone(input);
 }
 
 
