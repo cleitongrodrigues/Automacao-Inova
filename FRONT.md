@@ -841,3 +841,5 @@ const CONFIG = {
 **Criado em**: 17 de Abril de 2026  
 **Versão**: 1.0  
 **Stack**: HTML5 + CSS3 + JavaScript Vanilla + Bootstrap 5 + Chart.js
+
+teste
