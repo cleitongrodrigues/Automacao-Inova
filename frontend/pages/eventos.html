@@ -1,17 +1,17 @@
-<!-- GestÃ£o de Eventos - CRUD e GeraÃ§Ã£o de QR Code -->
+<!-- Gestão de Eventos - CRUD e Geração de QR Code -->
 
-<!-- CabeÃ§alho -->
+<!-- Cabeçalho -->
 <div style="margin-bottom: 2rem;">
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <h1 style="margin-bottom: 0.5rem;">ðŸ“… GestÃ£o de Eventos</h1>
+      <h1 style="margin-bottom: 0.5rem;">📅 Gestão de Eventos</h1>
       <p style="color: var(--cor-texto-secundario); margin: 0;">
-        Criar eventos e gerar QR Codes para registro de presenÃ§a
+        Criar eventos e gerar QR Codes para registro de presença
       </p>
     </div>
     <div>
       <button onclick="abrirModalNovoEvento()" class="btn btn-primary">
-        âž• Novo Evento
+        Novo Evento
       </button>
     </div>
   </div>
@@ -21,7 +21,7 @@
 <div id="evento-atual-card" class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--cor-primaria); background: linear-gradient(135deg, var(--cor-fundo) 0%, var(--cor-fundo-secundario) 100%);">
   <div style="display: flex; justify-content: space-between; align-items: center; gap: 2rem;">
     <div style="flex: 1;">
-      <h2 style="margin-bottom: 0.5rem;">ðŸŽ¯ Evento Ativo Hoje</h2>
+      <h2 style="margin-bottom: 0.5rem;">Evento Ativo Hoje</h2>
       <p id="evento-atual-nome" style="font-size: 1.2rem; margin: 0.5rem 0;">-</p>
       <p id="evento-atual-data" style="color: var(--cor-texto-secundario); margin: 0;">-</p>
     </div>
@@ -30,7 +30,7 @@
         <p style="color: var(--cor-texto-secundario); margin: 0;">Nenhum evento ativo</p>
       </div>
       <button id="btn-download-qr-atual" onclick="downloadQRCode('qrcode-atual', 'evento-atual.png')" class="btn btn-sm btn-secondary" style="margin-top: 1rem; display: none;">
-        â¬‡ï¸ Baixar QR Code
+        Baixar QR Code
       </button>
     </div>
   </div>
@@ -62,7 +62,7 @@
           <th>Status</th>
           <th>Reconhecimento Facial</th>
           <th>QR Code</th>
-          <th>AÃ§Ãµes</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody id="tbody-eventos">
@@ -101,7 +101,7 @@
               type="text" 
               id="nome-evento" 
               class="form-control" 
-              placeholder="Encontro de SÃ¡bado - Abril 2026"
+              placeholder="Encontro de Sábado - Abril 2026"
               required
             >
             <span class="form-error" id="erro-nome-evento"></span>
@@ -110,7 +110,7 @@
           <!-- Data -->
           <div class="form-group">
             <label for="data-evento" class="form-label">
-              Data (SÃ¡bado) <span style="color: var(--cor-erro);">*</span>
+              Data (Sábado) <span style="color: var(--cor-erro);">*</span>
             </label>
             <input 
               type="date" 
@@ -120,14 +120,14 @@
               onchange="validarSabado(this)"
             >
             <small style="color: var(--cor-texto-secundario);">
-              Apenas sÃ¡bados sÃ£o permitidos
+              Apenas sábados são permitidos
             </small>
             <span class="form-error" id="erro-data-evento"></span>
           </div>
           
-          <!-- HorÃ¡rio InÃ­cio -->
+          <!-- Horário Início -->
           <div class="form-group">
-            <label for="horario-inicio" class="form-label">HorÃ¡rio de InÃ­cio</label>
+            <label for="horario-inicio" class="form-label">Horário de Início</label>
             <input 
               type="time" 
               id="horario-inicio" 
@@ -136,9 +136,9 @@
             >
           </div>
           
-          <!-- HorÃ¡rio Fim -->
+          <!-- Horário Fim -->
           <div class="form-group">
-            <label for="horario-fim" class="form-label">HorÃ¡rio de TÃ©rmino</label>
+            <label for="horario-fim" class="form-label">Horário de Término</label>
             <input 
               type="time" 
               id="horario-fim" 
@@ -152,23 +152,23 @@
             <div class="form-check">
               <input type="checkbox" id="requer-facial" class="form-check-input">
               <label for="requer-facial" class="form-check-label">
-                <strong>ðŸ” Requer Reconhecimento Facial</strong>
+                <strong>🔐 Requer Reconhecimento Facial</strong>
                 <br>
                 <small style="color: var(--cor-texto-secundario);">
-                  Alunos precisarÃ£o tirar selfie ao registrar presenÃ§a
+                  Alunos precisarão tirar selfie ao registrar presença
                 </small>
               </label>
             </div>
           </div>
           
-          <!-- DescriÃ§Ã£o -->
+          <!-- Descrição -->
           <div class="form-group">
-            <label for="descricao-evento" class="form-label">DescriÃ§Ã£o (opcional)</label>
+            <label for="descricao-evento" class="form-label">Descrição (opcional)</label>
             <textarea 
               id="descricao-evento" 
               class="form-control" 
               rows="3"
-              placeholder="InformaÃ§Ãµes adicionais sobre o evento..."
+              placeholder="Informações adicionais sobre o evento..."
             ></textarea>
           </div>
           
@@ -180,7 +180,7 @@
           Cancelar
         </button>
         <button onclick="salvarEvento()" class="btn btn-primary">
-          ðŸ’¾ Salvar
+          Salvar
         </button>
       </div>
     </div>
@@ -199,7 +199,7 @@
       <div class="modal-body" style="text-align: center;">
         <h4 id="qrcode-evento-nome" style="margin-bottom: 1rem;"></h4>
         <div id="qrcode-preview" style="display: inline-block; background: white; padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--sombra);">
-          <!-- QR Code serÃ¡ gerado aqui -->
+          <!-- QR Code será gerado aqui -->
         </div>
         
         <div style="margin-top: 2rem; padding: 1rem; background: var(--cor-fundo-secundario); border-radius: var(--border-radius);">
@@ -214,14 +214,14 @@
             style="margin-top: 0.5rem; font-family: monospace; font-size: 0.75rem;"
           >
           <button onclick="copiarLink()" class="btn btn-sm btn-secondary" style="margin-top: 0.5rem;">
-            ðŸ“‹ Copiar Link
+            📋 Copiar Link
           </button>
         </div>
       </div>
       
       <div class="modal-footer">
         <button onclick="downloadQRCode('qrcode-preview', 'qrcode-evento.png')" class="btn btn-primary">
-          â¬‡ï¸ Baixar QR Code
+          Baixar QR Code
         </button>
       </div>
     </div>
@@ -265,7 +265,7 @@
     
     if (eventoHoje) {
       document.getElementById('evento-atual-nome').textContent = eventoHoje.nome;
-      document.getElementById('evento-atual-data').textContent = `ðŸ“… ${formatarData(new Date(eventoHoje.data + 'T00:00:00'))} | â° ${eventoHoje.horario_inicio} - ${eventoHoje.horario_fim}`;
+      document.getElementById('evento-atual-data').textContent = `📅 ${formatarData(new Date(eventoHoje.data + 'T00:00:00'))} | ⏰ ${eventoHoje.horario_inicio} - ${eventoHoje.horario_fim}`;
       
       const link = `${window.location.origin}/index.html#/presenca?token=${eventoHoje.qr_code_token}`;
       const qrcodeDiv = document.getElementById('qrcode-atual');
@@ -322,23 +322,23 @@
         <td>${evento.nome}</td>
         <td>
           <span class="badge ${evento.ativo ? 'badge-success' : 'badge-secondary'}">
-            ${evento.ativo ? 'âœ“ Ativo' : 'âœ— Inativo'}
+            ${evento.ativo ? '✓ Ativo' : '✗ Inativo'}
           </span>
         </td>
         <td>
-          ${evento.requer_reconhecimento_facial ? 'ðŸ” Sim' : '- NÃ£o'}
+          ${evento.requer_reconhecimento_facial ? '🔐 Sim' : '- Não'}
         </td>
         <td>
           <button onclick="visualizarQRCode(${evento.id})" class="btn btn-sm btn-secondary">
-            ðŸ“± Ver QR
+            📱 Ver QR
           </button>
         </td>
         <td>
           <button onclick="editarEvento(${evento.id})" class="btn btn-sm btn-secondary" title="Editar">
-            âœï¸
+            ✏️
           </button>
           <button onclick="toggleStatusEvento(${evento.id})" class="btn btn-sm ${evento.ativo ? 'btn-danger' : 'btn-success'}" title="${evento.ativo ? 'Desativar' : 'Ativar'}">
-            ${evento.ativo ? 'ðŸ”’' : 'âœ…'}
+            ${evento.ativo ? '🔒' : '✅'}
           </button>
         </td>
       </tr>
@@ -362,14 +362,14 @@
   }
   
   /**
-   * Validar se Ã© sÃ¡bado
+   * Validar se é sábado
    */
   function validarSabado(input) {
     const data = new Date(input.value + 'T00:00:00');
     const diaSemana = data.getDay();
     
     if (diaSemana !== 6) {
-      document.getElementById('erro-data-evento').textContent = 'Selecione um sÃ¡bado!';
+      document.getElementById('erro-data-evento').textContent = 'Selecione um sábado!';
       input.value = '';
     } else {
       document.getElementById('erro-data-evento').textContent = '';
@@ -414,11 +414,11 @@
     const descricao = document.getElementById('descricao-evento').value.trim();
     
     if (campoVazio(nome)) {
-      document.getElementById('erro-nome-evento').textContent = 'Nome Ã© obrigatÃ³rio';
+      document.getElementById('erro-nome-evento').textContent = 'Nome é obrigatório';
       return;
     }
     if (campoVazio(data)) {
-      document.getElementById('erro-data-evento').textContent = 'Data Ã© obrigatÃ³ria';
+      document.getElementById('erro-data-evento').textContent = 'Data é obrigatória';
       return;
     }
     
@@ -523,7 +523,7 @@
   function downloadQRCode(divId, nomeArquivo) {
     const canvas = document.querySelector(`#${divId} canvas`);
     if (!canvas) {
-      mostrarMensagem('error', 'QR Code nÃ£o encontrado');
+      mostrarMensagem('error', 'QR Code não encontrado');
       return;
     }
     
