@@ -1,0 +1,44 @@
+@serverUrl = http://localhost:5000
+@baseUrl = http://localhost:5000/api
+
+### Teste de saúde da API
+GET {{serverUrl}}/health
+
+### Listar usuários
+GET {{baseUrl}}/usuarios
+
+### Criar usuário
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "João Teste",
+  "email": "joao.teste@empresa.com",
+  "senha": "123456",
+  "perfil_id": 2
+}
+
+### Atualizar usuário
+PUT {{baseUrl}}/usuarios/1
+Content-Type: application/json
+
+{
+  "nome": "Maria Atualizada",
+  "email": "maria@empresa.com",
+  "perfil_id": 3,
+  "ativo": 1
+}
+
+### Desativar usuário
+DELETE {{baseUrl}}/usuarios/1
+
+### Teste de email duplicado
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{
+  "nome": "Outro Usuário",
+  "email": "maria@empresa.com",
+  "senha": "123456",
+  "perfil_id": 1
+}

@@ -1,29 +1,3 @@
-CREATE TABLE IF NOT EXISTS alunos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome TEXT NOT NULL,
-  cpf TEXT NOT NULL UNIQUE,
-  matricula TEXT UNIQUE,
-  email TEXT NOT NULL,
-  telefone TEXT,
-  empresa TEXT,
-  foto_cadastro TEXT,
-  ativo INTEGER NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS eventos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome TEXT NOT NULL,
-  data TEXT NOT NULL,
-  horario_inicio TEXT,
-  horario_fim TEXT,
-  qr_code_token TEXT NOT NULL UNIQUE,
-  requer_reconhecimento_facial INTEGER NOT NULL DEFAULT 1,
-  ativo INTEGER NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS presencas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   aluno_id INTEGER NOT NULL,
@@ -35,4 +9,27 @@ CREATE TABLE IF NOT EXISTS presencas (
   FOREIGN KEY (aluno_id) REFERENCES alunos(id),
   FOREIGN KEY (evento_id) REFERENCES eventos(id),
   UNIQUE (aluno_id, evento_id)
+); -- ← AQUI ESTAVA FALTANDO
+
+CREATE TABLE IF NOT EXISTS perfil (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL UNIQUE,
+  descricao TEXT
 );
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  senha_hash TEXT NOT NULL,
+  perfil_id INTEGER NOT NULL,
+  ativo INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (perfil_id) REFERENCES perfil(id)
+);
+
+INSERT OR IGNORE INTO perfil (id, nome, descricao) VALUES
+(1, 'operador', 'Perfil operacional'),
+(2, 'admin', 'Administrador do sistema'),
+(3, 'super_admin', 'Acesso total');
